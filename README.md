@@ -1,10 +1,5 @@
 # 🔒 DisKenGrab - Authorized Discord Security Testing Platform
 
-![Security](https://img.shields.io/badge/Security-Penetration-Testing-red)
-![Platform](https://img.shields.io/badge/Platform-Discord-Approved-blue)
-![License](https://img.shields.io/badge/License-Proprietary-black)
-![Status](https://img.shields.io/badge/Status-Active-Development-success)
-
 Authorized penetration testing platform for Discord token security analysis and educational security research.
 
 ---
