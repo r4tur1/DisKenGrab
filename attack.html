@@ -248,9 +248,18 @@
         // Initialize Firebase
         let db;
         if (typeof firebaseConfig !== 'undefined') {
-            firebase.initializeApp(firebaseConfig);
-            db = firebase.firestore();
-            console.log('Attack page initialized for campaign:', attackId);
+            try {
+                // Check if already initialized
+                if (!firebase.apps.length) {
+                    firebase.initializeApp(firebaseConfig);
+                }
+                db = firebase.firestore();
+               console.log('✅ Attack page Firebase initialized for campaign:', attackId);
+            } catch (error) {
+                console.error('❌ Firebase initialization error:', error);
+            }
+        } else {
+            console.error('❌ Firebase config not found in attack page');
         }
 
         // Form submission handler
