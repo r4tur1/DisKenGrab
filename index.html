@@ -1218,103 +1218,138 @@
             }, 2000);
         }       
         function initializeAuth() {
+            console.log('🔐 Initializing authentication system...');
             // ==================== AUTHENTICATION SYSTEM ====================
             
-            // Auth tabs
-            document.querySelectorAll('.auth-tab').forEach(tab => {
-                tab.addEventListener('click', function() {
-                    document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
-                    document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
-                    this.classList.add('active');
-                    document.getElementById(this.dataset.form + 'Form').classList.add('active');
-                });
-            });
+// Auth tabs
+    document.querySelectorAll('.auth-tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+            this.classList.add('active');
+            document.getElementById(this.dataset.form + 'Form').classList.add('active');
+        });
+    });
 
-            // Login function
-            document.getElementById('loginBtn').addEventListener('click', async function() {
-                const email = document.getElementById('loginEmail').value;
-                const password = document.getElementById('loginPassword').value;
-                const errorDiv = document.getElementById('loginError');
-                const spinner = document.getElementById('loginSpinner');
+    // Login function - with better error handling
+    const loginBtn = document.getElementById('loginBtn');
+    if (loginBtn) {
+        loginBtn.addEventListener('click', async function(e) {
+            e.preventDefault();
+            console.log('🔑 Login attempt...');
+            
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const errorDiv = document.getElementById('loginError');
+            const spinner = document.getElementById('loginSpinner');
 
-                if (!email || !password) {
-                    showError(errorDiv, 'Please fill in all fields');
-                    return;
-                }
+            if (!email || !password) {
+                alert('Please fill in all fields');
+                return;
+            }
 
-                showLoading(this, spinner);
-                clearError(errorDiv);
+            console.log('Logging in with:', email);
+            
+            // Show loading state
+            this.disabled = true;
+            if (spinner) spinner.style.display = 'inline-block';
+            if (errorDiv) errorDiv.style.display = 'none';
 
-                try {
-                    const userCredential = await auth.signInWithEmailAndPassword(email, password);
-                    currentUser = userCredential.user;
-                    await initializeApp();
-                } catch (error) {
-                    showError(errorDiv, getAuthErrorMessage(error));
-                } finally {
-                    hideLoading(this, spinner);
-                }
-            });
-
-            // Registration function
-            document.getElementById('registerBtn').addEventListener('click', async function() {
-                const name = document.getElementById('registerName').value;
-                const email = document.getElementById('registerEmail').value;
-                const password = document.getElementById('registerPassword').value;
-                const authCode = document.getElementById('authCode').value;
-                const errorDiv = document.getElementById('registerError');
-                const spinner = document.getElementById('registerSpinner');
-
-                if (!name || !email || !password || !authCode) {
-                    showError(errorDiv, 'Please fill in all fields');
-                    return;
-                }
-
-                if (authCode !== "DISCORD2024") {
-                    showError(errorDiv, 'Invalid authorization code');
-                    return;
-                }
-
-                showLoading(this, spinner);
-                clearError(errorDiv);
-
-                try {
-                    const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-                    await userCredential.user.updateProfile({ displayName: name });
-                    
-                    // Save user to Firestore
-                    await db.collection('pentesters').doc(userCredential.user.uid).set({
-                        name: name,
-                        email: email,
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                        isActive: true,
-                        role: 'pentester'
-                    });
-
-                    currentUser = userCredential.user;
-                    await initializeApp();
-                } catch (error) {
-                    showError(errorDiv, getAuthErrorMessage(error));
-                } finally {
-                    hideLoading(this, spinner);
-                }
-            });
-
-            // Logout function
-            document.getElementById('logoutBtn').addEventListener('click', function() {
-                auth.signOut();
-            });
-
-            // Auth state listener
-            auth.onAuthStateChanged(async (user) => {
-                if (user) {
-                    currentUser = user;
-                    await initializeApp();
+            try {
+                const userCredential = await auth.signInWithEmailAndPassword(email, password);
+                currentUser = userCredential.user;
+                console.log('✅ Login successful:', currentUser.email);
+                await initializeApp();
+            } catch (error) {
+                console.error('❌ Login error:', error);
+                const errorMsg = getAuthErrorMessage ? getAuthErrorMessage(error) : error.message;
+                if (errorDiv) {
+                    errorDiv.textContent = errorMsg;
+                    errorDiv.style.display = 'block';
                 } else {
-                    showAuthPage();
+                    alert('Login error: ' + errorMsg);
                 }
-            });
-        }
+            } finally {
+                this.disabled = false;
+                if (spinner) spinner.style.display = 'none';
+            }
+        });
+    }
+
+    // Registration function - with better error handling
+    const registerBtn = document.getElementById('registerBtn');
+    if (registerBtn) {
+        registerBtn.addEventListener('click', async function(e) {
+            e.preventDefault();
+            console.log('📝 Registration attempt...');
+            
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const authCode = document.getElementById('authCode').value;
+            const errorDiv = document.getElementById('registerError');
+            const spinner = document.getElementById('registerSpinner');
+
+            if (!name || !email || !password || !authCode) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            if (authCode !== "DISCORD2024") {
+                alert('Invalid authorization code. Use: DISCORD2024');
+                return;
+            }
+
+            console.log('Registering:', { name, email, authCode });
+            
+            // Show loading state
+            this.disabled = true;
+            if (spinner) spinner.style.display = 'inline-block';
+            if (errorDiv) errorDiv.style.display = 'none';
+
+            try {
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                await userCredential.user.updateProfile({ displayName: name });
+                
+                // Save user to Firestore
+                await db.collection('pentesters').doc(userCredential.user.uid).set({
+                    name: name,
+                    email: email,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    isActive: true,
+                    role: 'pentester'
+                });
+
+                currentUser = userCredential.user;
+                console.log('✅ Registration successful:', currentUser.email);
+                await initializeApp();
+            } catch (error) {
+                console.error('❌ Registration error:', error);
+                const errorMsg = getAuthErrorMessage ? getAuthErrorMessage(error) : error.message;
+                if (errorDiv) {
+                    errorDiv.textContent = errorMsg;
+                    errorDiv.style.display = 'block';
+                } else {
+                    alert('Registration error: ' + errorMsg);
+                }
+            } finally {
+                this.disabled = false;
+                if (spinner) spinner.style.display = 'none';
+            }
+        });
+    }
+
+    // Logout function
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', function() {
+            console.log('🚪 Logging out...');
+            auth.signOut();
+        });
+    }
+
+    console.log('✅ Auth system initialized');
+}
 
         // ==================== APPLICATION INITIALIZATION ====================
         async function initializeApp() {
