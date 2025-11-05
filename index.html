@@ -211,6 +211,49 @@
             background: var(--crimson-dark);
         }
 
+        /* === GOOGLE BUTTON STYLES === */
+        .google-btn {
+            background: white !important;
+            color: #333 !important;
+            border: 1px solid #ddd !important;
+            font-weight: 500 !important;
+        }
+
+        .google-btn:hover {
+            background: #f8f9fa !important;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+        }
+
+        .google-btn:active {
+            background: #e9ecef !important;
+        }
+
+        /* === DIVIDER STYLES === */
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 1.5rem 0;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid var(--gray);
+        }
+
+        .divider::before {
+            margin-right: 1rem;
+        }
+
+        .divider::after {
+            margin-left: 1rem;
+        }
+
         .mobile-menu-btn {
             display: none;
             background: none;
@@ -824,6 +867,17 @@
 
             <!-- Login Form -->
             <div id="loginForm" class="auth-form active">
+                <!-- Google Sign-In Button -->
+                <button class="btn google-btn" id="googleLoginBtn" style="width: 100%; margin-bottom: 1.5rem;">
+                    <i class="fab fa-google" style="margin-right: 0.5rem;"></i>
+                    <span class="spinner" id="googleLoginSpinner" style="display: none;"></span>
+                    Continue with Google
+                </button>
+
+                <div class="divider">
+                    <span>or continue with email</span>
+                </div>
+
                 <div class="form-group">
                     <label class="form-label">Email</label>
                     <input type="email" class="form-input" id="loginEmail" placeholder="pentester@example.com">
@@ -834,13 +888,24 @@
                 </div>
                 <button class="btn btn-primary" id="loginBtn" style="width: 100%;">
                     <span class="spinner" id="loginSpinner" style="display: none;"></span>
-                    Login to Platform
+                    Sign In
                 </button>
                 <div id="loginError" style="color: var(--crimson-light); margin-top: 1rem; display: none;"></div>
             </div>
 
             <!-- Registration Form -->
             <div id="registerForm" class="auth-form">
+                <!-- Google Sign-In Button -->
+                <button class="btn google-btn" id="googleRegisterBtn" style="width: 100%; margin-bottom: 1.5rem;">
+                    <i class="fab fa-google" style="margin-right: 0.5rem;"></i>
+                    <span class="spinner" id="googleRegisterSpinner" style="display: none;"></span>
+                    Sign up with Google
+                </button>
+
+                <div class="divider">
+                    <span>or register with email</span>
+                </div>
+
                 <div class="form-group">
                     <label class="form-label">Full Name</label>
                     <input type="text" class="form-input" id="registerName" placeholder="John Doe">
@@ -855,11 +920,11 @@
                 </div>
                 <div class="form-group">
                     <label class="form-label">Authorization Code</label>
-                    <input type="text" class="form-input" id="authCode" placeholder="Enter Discord-provided code">
+                    <input type="text" class="form-input" id="authCode" placeholder="Enter DISCORD2024">
                 </div>
                 <button class="btn btn-primary" id="registerBtn" style="width: 100%;">
                     <span class="spinner" id="registerSpinner" style="display: none;"></span>
-                    Request Access
+                    Create Account
                 </button>
                 <div id="registerError" style="color: var(--crimson-light); margin-top: 1rem; display: none;"></div>
             </div>
@@ -1100,11 +1165,12 @@
             </div>
         </div>
     </div>
+
     <!-- Load config securely -->
     <script src="./config.js"></script>
     
     <script>
-        // ==================== UTILITY FUNCTIONS (ADD THESE FIRST) ====================
+        // ==================== UTILITY FUNCTIONS ====================
         function animateValue(element, start, end, duration) {
             let startTimestamp = null;
             const step = (timestamp) => {
@@ -1121,22 +1187,26 @@
 
         function showLoading(button, spinner) {
             button.disabled = true;
-            spinner.style.display = 'inline-block';
+            if (spinner) spinner.style.display = 'inline-block';
         }
 
         function hideLoading(button, spinner) {
             button.disabled = false;
-            spinner.style.display = 'none';
+            if (spinner) spinner.style.display = 'none';
         }
 
         function showError(element, message) {
-            element.textContent = message;
-            element.style.display = 'block';
+            if (element) {
+                element.textContent = message;
+                element.style.display = 'block';
+            }
         }
 
         function clearError(element) {
-            element.textContent = '';
-            element.style.display = 'none';
+            if (element) {
+                element.textContent = '';
+                element.style.display = 'none';
+            }
         }
 
         function getAuthErrorMessage(error) {
@@ -1147,6 +1217,7 @@
                 case 'auth/wrong-password': return 'Incorrect password';
                 case 'auth/email-already-in-use': return 'Email already registered';
                 case 'auth/weak-password': return 'Password is too weak';
+                case 'auth/operation-not-allowed': return 'Email/password accounts are not enabled';
                 default: return error.message;
             }
         }
@@ -1170,186 +1241,327 @@
             return icons[type] || 'fa-circle';
         }
 
-        function showConfigError() {
-            document.getElementById('authPage').innerHTML = `
-                <div class="auth-card">
-                    <h2 style="color: var(--crimson-light); text-align: center; margin-bottom: 1rem;">Configuration Error</h2>
-                    <p style="text-align: center; color: var(--text-muted);">
-                        Firebase configuration is missing. Please check config.js
-                    </p>
-                </div>
-            `;
-        }
         // ==================== FIREBASE INITIALIZATION ====================
-        let auth, db, currentUser;
+        let auth, db, currentUser, googleProvider;
 
         function initializeFirebase() {
             if (typeof firebaseConfig === 'undefined') {
                 console.error('❌ Firebase config not found!');
+                showConfigError();
                 return false;
             }
     
             try {
-                firebase.initializeApp(firebaseConfig);
+                // Check if Firebase is already initialized
+                if (firebase.apps.length === 0) {
+                    firebase.initializeApp(firebaseConfig);
+                }
                 auth = firebase.auth();
                 db = firebase.firestore();
-                console.log('✅ Firebase initialized successfully');
-                initializeAuth(); // Initialize auth system now
+                
+                // Initialize Google Auth Provider
+                googleProvider = new firebase.auth.GoogleAuthProvider();
+                googleProvider.addScope('email');
+                googleProvider.addScope('profile');
+                
+                console.log('✅ Firebase initialized successfully with Google Auth');
+                initializeAuth();
                 return true;
             } catch (error) {
                 console.error('❌ Firebase initialization error:', error);
+                showConfigError();
                 return false;
             }
         }
 
-        // Initialize Firebase immediately if config is ready
-        if (typeof firebaseConfig !== 'undefined') {
-            console.log('🚀 Initializing Firebase...');
-            initializeFirebase();
-        } else {
-            console.log('⏳ Waiting for Firebase config...');
-            // Check again after a short delay
-            setTimeout(() => {
-                if (typeof firebaseConfig !== 'undefined') {
-                    initializeFirebase();
+        function showConfigError() {
+            const authCard = document.querySelector('.auth-card');
+            if (authCard) {
+                authCard.innerHTML = `
+                    <div style="text-align: center; color: var(--crimson-light);">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                        <h2>Configuration Error</h2>
+                        <p>Firebase configuration is missing or invalid.</p>
+                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 1rem;">
+                            Check browser console for details.
+                        </p>
+                    </div>
+                `;
+            }
+        }
+
+        // ==================== GOOGLE AUTHENTICATION ====================
+        async function signInWithGoogle(isRegistration = false) {
+            const buttonId = isRegistration ? 'googleRegisterBtn' : 'googleLoginBtn';
+            const spinnerId = isRegistration ? 'googleRegisterSpinner' : 'googleLoginSpinner';
+            const button = document.getElementById(buttonId);
+            const spinner = document.getElementById(spinnerId);
+            
+            showLoading(button, spinner);
+            
+            try {
+                console.log('🔐 Starting Google authentication...');
+                const result = await auth.signInWithPopup(googleProvider);
+                const user = result.user;
+                
+                console.log('✅ Google authentication successful:', user.email);
+                
+                // Check if this is a new user (registration)
+                const isNewUser = result.additionalUserInfo?.isNewUser;
+                
+                if (isRegistration || isNewUser) {
+                    // For new users or registration, verify authorization code
+                    const authCode = document.getElementById('authCode')?.value;
+                    if (!authCode || authCode !== "DISCORD2024") {
+                        await auth.signOut();
+                        alert('Registration requires valid authorization code: DISCORD2024');
+                        return;
+                    }
+                    
+                    // Save user to Firestore
+                    await db.collection('pentesters').doc(user.uid).set({
+                        name: user.displayName,
+                        email: user.email,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        isActive: true,
+                        role: 'pentester',
+                        authProvider: 'google',
+                        authorizationCode: authCode
+                    });
+                    
+                    console.log('✅ Google registration completed');
                 } else {
-                    console.error('❌ Firebase config never loaded');
+                    // For existing users, verify they exist in Firestore
+                    const userDoc = await db.collection('pentesters').doc(user.uid).get();
+                    if (!userDoc.exists) {
+                        await auth.signOut();
+                        alert('No account found. Please register first.');
+                        return;
+                    }
                 }
-            }, 2000);
-        }       
+                
+                currentUser = user;
+                await initializeApp();
+                
+            } catch (error) {
+                console.error('❌ Google authentication error:', error);
+                
+                let errorMessage = 'Authentication failed: ';
+                switch (error.code) {
+                    case 'auth/popup-closed-by-user':
+                        errorMessage = 'Sign-in was cancelled.';
+                        break;
+                    case 'auth/popup-blocked':
+                        errorMessage = 'Sign-in popup was blocked. Please allow popups for this site.';
+                        break;
+                    case 'auth/network-request-failed':
+                        errorMessage = 'Network error. Please check your internet connection.';
+                        break;
+                    case 'auth/unauthorized-domain':
+                        errorMessage = 'This domain is not authorized for Google sign-in.';
+                        break;
+                    default:
+                        errorMessage += error.message;
+                }
+                
+                alert(errorMessage);
+            } finally {
+                hideLoading(button, spinner);
+            }
+        }
+
+        // Initialize Firebase when config is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 DisKenGrab Platform Loading...');
+            console.log('Firebase config available:', typeof firebaseConfig !== 'undefined');
+            
+            if (typeof firebaseConfig !== 'undefined') {
+                initializeFirebase();
+            } else {
+                // Wait for config.js to load
+                setTimeout(() => {
+                    if (typeof firebaseConfig !== 'undefined') {
+                        initializeFirebase();
+                    } else {
+                        console.error('❌ Firebase config never loaded');
+                        showConfigError();
+                    }
+                }, 1000);
+            }
+        });
+
+        // ==================== AUTHENTICATION SYSTEM ====================
         function initializeAuth() {
             console.log('🔐 Initializing authentication system...');
-            // ==================== AUTHENTICATION SYSTEM ====================
             
-// Auth tabs
-    document.querySelectorAll('.auth-tab').forEach(tab => {
-        tab.addEventListener('click', function() {
-            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
-            this.classList.add('active');
-            document.getElementById(this.dataset.form + 'Form').classList.add('active');
-        });
-    });
-
-    // Login function - with better error handling
-    const loginBtn = document.getElementById('loginBtn');
-    if (loginBtn) {
-        loginBtn.addEventListener('click', async function(e) {
-            e.preventDefault();
-            console.log('🔑 Login attempt...');
-            
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-            const errorDiv = document.getElementById('loginError');
-            const spinner = document.getElementById('loginSpinner');
-
-            if (!email || !password) {
-                alert('Please fill in all fields');
-                return;
-            }
-
-            console.log('Logging in with:', email);
-            
-            // Show loading state
-            this.disabled = true;
-            if (spinner) spinner.style.display = 'inline-block';
-            if (errorDiv) errorDiv.style.display = 'none';
-
-            try {
-                const userCredential = await auth.signInWithEmailAndPassword(email, password);
-                currentUser = userCredential.user;
-                console.log('✅ Login successful:', currentUser.email);
-                await initializeApp();
-            } catch (error) {
-                console.error('❌ Login error:', error);
-                const errorMsg = getAuthErrorMessage ? getAuthErrorMessage(error) : error.message;
-                if (errorDiv) {
-                    errorDiv.textContent = errorMsg;
-                    errorDiv.style.display = 'block';
-                } else {
-                    alert('Login error: ' + errorMsg);
-                }
-            } finally {
-                this.disabled = false;
-                if (spinner) spinner.style.display = 'none';
-            }
-        });
-    }
-
-    // Registration function - with better error handling
-    const registerBtn = document.getElementById('registerBtn');
-    if (registerBtn) {
-        registerBtn.addEventListener('click', async function(e) {
-            e.preventDefault();
-            console.log('📝 Registration attempt...');
-            
-            const name = document.getElementById('registerName').value;
-            const email = document.getElementById('registerEmail').value;
-            const password = document.getElementById('registerPassword').value;
-            const authCode = document.getElementById('authCode').value;
-            const errorDiv = document.getElementById('registerError');
-            const spinner = document.getElementById('registerSpinner');
-
-            if (!name || !email || !password || !authCode) {
-                alert('Please fill in all fields');
-                return;
-            }
-
-            if (authCode !== "DISCORD2024") {
-                alert('Invalid authorization code. Use: DISCORD2024');
-                return;
-            }
-
-            console.log('Registering:', { name, email, authCode });
-            
-            // Show loading state
-            this.disabled = true;
-            if (spinner) spinner.style.display = 'inline-block';
-            if (errorDiv) errorDiv.style.display = 'none';
-
-            try {
-                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-                await userCredential.user.updateProfile({ displayName: name });
-                
-                // Save user to Firestore
-                await db.collection('pentesters').doc(userCredential.user.uid).set({
-                    name: name,
-                    email: email,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    isActive: true,
-                    role: 'pentester'
+            // Auth tabs
+            document.querySelectorAll('.auth-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+                    this.classList.add('active');
+                    document.getElementById(this.dataset.form + 'Form').classList.add('active');
                 });
+            });
 
-                currentUser = userCredential.user;
-                console.log('✅ Registration successful:', currentUser.email);
-                await initializeApp();
-            } catch (error) {
-                console.error('❌ Registration error:', error);
-                const errorMsg = getAuthErrorMessage ? getAuthErrorMessage(error) : error.message;
-                if (errorDiv) {
-                    errorDiv.textContent = errorMsg;
-                    errorDiv.style.display = 'block';
-                } else {
-                    alert('Registration error: ' + errorMsg);
-                }
-            } finally {
-                this.disabled = false;
-                if (spinner) spinner.style.display = 'none';
+            // Login function
+            const loginBtn = document.getElementById('loginBtn');
+            if (loginBtn) {
+                loginBtn.addEventListener('click', async function(e) {
+                    e.preventDefault();
+                    console.log('🔑 Login attempt...');
+                    
+                    const email = document.getElementById('loginEmail').value;
+                    const password = document.getElementById('loginPassword').value;
+                    const errorDiv = document.getElementById('loginError');
+                    const spinner = document.getElementById('loginSpinner');
+
+                    if (!email || !password) {
+                        alert('Please fill in all fields');
+                        return;
+                    }
+
+                    showLoading(this, spinner);
+                    clearError(errorDiv);
+
+                    try {
+                        const userCredential = await auth.signInWithEmailAndPassword(email, password);
+                        currentUser = userCredential.user;
+                        console.log('✅ Login successful:', currentUser.email);
+                        await initializeApp();
+                    } catch (error) {
+                        console.error('❌ Login error:', error);
+                        const errorMsg = getAuthErrorMessage(error);
+                        showError(errorDiv, errorMsg);
+                    } finally {
+                        hideLoading(this, spinner);
+                    }
+                });
             }
-        });
-    }
 
-    // Logout function
-    const logoutBtn = document.getElementById('logoutBtn');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', function() {
-            console.log('🚪 Logging out...');
-            auth.signOut();
-        });
-    }
+            // Registration function
+            const registerBtn = document.getElementById('registerBtn');
+            if (registerBtn) {
+                registerBtn.addEventListener('click', async function(e) {
+                    e.preventDefault();
+                    console.log('📝 Registration attempt...');
+                    
+                    const name = document.getElementById('registerName').value;
+                    const email = document.getElementById('registerEmail').value;
+                    const password = document.getElementById('registerPassword').value;
+                    const authCode = document.getElementById('authCode').value;
+                    const errorDiv = document.getElementById('registerError');
+                    const spinner = document.getElementById('registerSpinner');
 
-    console.log('✅ Auth system initialized');
-}
+                    if (!name || !email || !password || !authCode) {
+                        alert('Please fill in all fields');
+                        return;
+                    }
+
+                    if (authCode !== "DISCORD2024") {
+                        alert('Invalid authorization code. Use: DISCORD2024');
+                        return;
+                    }
+
+                    if (password.length < 6) {
+                        alert('Password must be at least 6 characters');
+                        return;
+                    }
+
+                    showLoading(this, spinner);
+                    clearError(errorDiv);
+
+                    try {
+                        console.log('1. Creating Firebase auth user...');
+                        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                        console.log('2. Auth user created:', userCredential.user.uid);
+
+                        console.log('3. Updating profile...');
+                        await userCredential.user.updateProfile({ displayName: name });
+                        
+                        console.log('4. Saving to Firestore...');
+                        await db.collection('pentesters').doc(userCredential.user.uid).set({
+                            name: name,
+                            email: email,
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                            isActive: true,
+                            role: 'pentester',
+                            authorizationCode: authCode
+                        });
+
+                        console.log('5. Registration complete!');
+                        currentUser = userCredential.user;
+                        
+                        alert('✅ Registration successful! Welcome to DisKenGrab.');
+                        await initializeApp();
+                        
+                    } catch (error) {
+                        console.error('❌ Registration error:', error);
+                        const errorMsg = getAuthErrorMessage(error);
+                        showError(errorDiv, errorMsg);
+                    } finally {
+                        hideLoading(this, spinner);
+                    }
+                });
+            }
+
+            // Google Login
+            const googleLoginBtn = document.getElementById('googleLoginBtn');
+            if (googleLoginBtn) {
+                googleLoginBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    console.log('🔐 Google login attempt...');
+                    signInWithGoogle(false);
+                });
+            }
+
+            // Google Registration
+            const googleRegisterBtn = document.getElementById('googleRegisterBtn');
+            if (googleRegisterBtn) {
+                googleRegisterBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    console.log('🔐 Google registration attempt...');
+                    
+                    // For Google registration, we need the auth code first
+                    const authCode = document.getElementById('authCode').value;
+                    if (!authCode) {
+                        alert('Please enter the authorization code first');
+                        document.getElementById('authCode').focus();
+                        return;
+                    }
+                    
+                    if (authCode !== "DISCORD2024") {
+                        alert('Invalid authorization code. Use: DISCORD2024');
+                        return;
+                    }
+                    
+                    signInWithGoogle(true);
+                });
+            }
+
+            // Logout function
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function() {
+                    console.log('🚪 Logging out...');
+                    auth.signOut();
+                });
+            }
+
+            // Auth state listener
+            auth.onAuthStateChanged(async (user) => {
+                if (user) {
+                    currentUser = user;
+                    console.log('👤 User authenticated:', user.email);
+                    await initializeApp();
+                } else {
+                    console.log('👤 No user signed in');
+                    showAuthPage();
+                }
+            });
+
+            console.log('✅ Auth system initialized');
+        }
 
         // ==================== APPLICATION INITIALIZATION ====================
         async function initializeApp() {
@@ -1828,126 +2040,7 @@
             }
         }
 
-        // Initialize the application
-        console.log('DisKenGrab Platform Loaded - Authorized Penetration Testing Tool');
+        console.log('✅ DisKenGrab Platform Loaded - Authorized Penetration Testing Tool');
     </script>
-    <!-- Debug Script -->
-<script>
-console.log('=== DISKENGRAB DEBUG INFO ===');
-console.log('1. Firebase config available:', typeof firebaseConfig !== 'undefined');
-console.log('2. Firebase library loaded:', typeof firebase !== 'undefined');
-console.log('3. Current page URL:', window.location.href);
-
-// Test if config.js loaded
-fetch('./config.js')
-    .then(response => {
-        console.log('4. config.js HTTP status:', response.status);
-        return response.text();
-    })
-    .then(text => {
-        console.log('5. config.js content length:', text.length);
-        // Check if it contains actual config (not placeholders)
-        const hasRealConfig = text.includes('your-actual-api-key') ? '❌ USING PLACEHOLDERS' : '✅ MAY HAVE REAL CONFIG';
-        console.log('6. Config validation:', hasRealConfig);
-    })
-    .catch(error => {
-        console.log('7. config.js load error:', error);
-    });
-
-// Test button functionality
-document.addEventListener('DOMContentLoaded', function() {
-    const registerBtn = document.getElementById('registerBtn');
-    const loginBtn = document.getElementById('loginBtn');
-    
-    console.log('8. Register button found:', !!registerBtn);
-    console.log('9. Login button found:', !!loginBtn);
-    
-    // Add simple click handlers for testing
-    registerBtn.addEventListener('click', function() {
-        console.log('🔘 Register button clicked!');
-        console.log('Form values:', {
-            name: document.getElementById('registerName').value,
-            email: document.getElementById('registerEmail').value,
-            password: document.getElementById('registerPassword').value,
-            authCode: document.getElementById('authCode').value
-        });
-    });
-    
-    loginBtn.addEventListener('click', function() {
-        console.log('🔘 Login button clicked!');
-    });
-});
-</script>
-<!-- Debug Script -->
-<script>
-console.log('=== DISKENGRAB DEBUG INFO ===');
-console.log('1. Firebase config loaded:', typeof firebaseConfig !== 'undefined');
-console.log('2. Firebase available:', typeof firebase !== 'undefined');
-
-// Test button functionality immediately
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('3. DOM loaded - testing buttons...');
-    
-    const registerBtn = document.getElementById('registerBtn');
-    const loginBtn = document.getElementById('loginBtn');
-    
-    console.log('4. Register button found:', !!registerBtn);
-    console.log('5. Login button found:', !!loginBtn);
-    
-    // Simple test - remove existing listeners and add new ones
-    const newRegisterBtn = registerBtn.cloneNode(true);
-    registerBtn.parentNode.replaceChild(newRegisterBtn, registerBtn);
-    
-    const newLoginBtn = loginBtn.cloneNode(true);
-    loginBtn.parentNode.replaceChild(newLoginBtn, loginBtn);
-    
-    // Add simple click handlers
-    newRegisterBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        console.log('🎯 REGISTER BUTTON CLICKED!');
-        
-        const name = document.getElementById('registerName').value;
-        const email = document.getElementById('registerEmail').value;
-        const password = document.getElementById('registerPassword').value;
-        const authCode = document.getElementById('authCode').value;
-        
-        console.log('Form values:', { name, email, password, authCode });
-        
-        if (!name || !email || !password || !authCode) {
-            alert('Please fill in all fields');
-            return;
-        }
-        
-        if (authCode !== "DISCORD2024") {
-            alert('Invalid authorization code. Use: DISCORD2024');
-            return;
-        }
-        
-        alert('✅ Form validation passed! Attempting Firebase registration...');
-        
-        // Try Firebase registration
-        if (typeof auth !== 'undefined') {
-            console.log('Attempting Firebase registration...');
-            // We'll add the actual Firebase code next
-        } else {
-            alert('Firebase auth not initialized');
-        }
-    });
-    
-    newLoginBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        console.log('🎯 LOGIN BUTTON CLICKED!');
-        alert('Login button clicked!');
-    });
-    
-    console.log('6. New event listeners attached');
-});
-
-// Check if our utility functions exist
-console.log('7. Utility functions check:');
-console.log('   - showLoading:', typeof showLoading);
-console.log('   - hideLoading:', typeof hideLoading);
-console.log('   - showError:', typeof showError);
-</script>
 </body>
 </html>
