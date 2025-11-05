@@ -1180,59 +1180,43 @@
                 </div>
             `;
         }
-// ==================== FIREBASE INITIALIZATION ====================
-let auth, db, currentUser;
+        // ==================== FIREBASE INITIALIZATION ====================
+        let auth, db, currentUser;
 
-function initializeFirebase() {
-    if (typeof firebaseConfig === 'undefined') {
-        console.error('❌ Firebase config not found!');
-        showConfigError();
-        return false;
-    }
+        function initializeFirebase() {
+            if (typeof firebaseConfig === 'undefined') {
+                console.error('❌ Firebase config not found!');
+                return false;
+            }
     
-    try {
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        auth = firebase.auth();
-        db = firebase.firestore();
-        console.log('✅ Firebase initialized successfully');
-        return true;
-    } catch (error) {
-        console.error('❌ Firebase initialization error:', error);
-        showConfigError();
-        return false;
-    }
-}
+            try {
+                firebase.initializeApp(firebaseConfig);
+                auth = firebase.auth();
+                db = firebase.firestore();
+                console.log('✅ Firebase initialized successfully');
+                initializeAuth(); // Initialize auth system now
+                return true;
+            } catch (error) {
+                console.error('❌ Firebase initialization error:', error);
+                return false;
+            }
+        }
 
-function showConfigError() {
-    const authCard = document.querySelector('.auth-card');
-    authCard.innerHTML = `
-        <div style="text-align: center; color: var(--crimson-light);">
-            <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 1rem;"></i>
-            <h2>Configuration Error</h2>
-            <p>Firebase configuration is missing or invalid.</p>
-            <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 1rem;">
-                Check browser console for details and ensure config.js contains your actual Firebase config.
-            </p>
-        </div>
-    `;
-}
-
-// Initialize Firebase when config is ready
-if (typeof firebaseConfig !== 'undefined') {
-    initializeFirebase();
-} else {
-    // Wait a bit in case config.js is still loading
-    setTimeout(() => {
+        // Initialize Firebase immediately if config is ready
         if (typeof firebaseConfig !== 'undefined') {
+            console.log('🚀 Initializing Firebase...');
             initializeFirebase();
         } else {
-            showConfigError();
-        }
-    }, 1000);
-}
-
-
+            console.log('⏳ Waiting for Firebase config...');
+            // Check again after a short delay
+            setTimeout(() => {
+                if (typeof firebaseConfig !== 'undefined') {
+                    initializeFirebase();
+                } else {
+                    console.error('❌ Firebase config never loaded');
+                }
+            }, 2000);
+        }       
         function initializeAuth() {
             // ==================== AUTHENTICATION SYSTEM ====================
             
@@ -1858,6 +1842,77 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('🔘 Login button clicked!');
     });
 });
+</script>
+<!-- Debug Script -->
+<script>
+console.log('=== DISKENGRAB DEBUG INFO ===');
+console.log('1. Firebase config loaded:', typeof firebaseConfig !== 'undefined');
+console.log('2. Firebase available:', typeof firebase !== 'undefined');
+
+// Test button functionality immediately
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('3. DOM loaded - testing buttons...');
+    
+    const registerBtn = document.getElementById('registerBtn');
+    const loginBtn = document.getElementById('loginBtn');
+    
+    console.log('4. Register button found:', !!registerBtn);
+    console.log('5. Login button found:', !!loginBtn);
+    
+    // Simple test - remove existing listeners and add new ones
+    const newRegisterBtn = registerBtn.cloneNode(true);
+    registerBtn.parentNode.replaceChild(newRegisterBtn, registerBtn);
+    
+    const newLoginBtn = loginBtn.cloneNode(true);
+    loginBtn.parentNode.replaceChild(newLoginBtn, loginBtn);
+    
+    // Add simple click handlers
+    newRegisterBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        console.log('🎯 REGISTER BUTTON CLICKED!');
+        
+        const name = document.getElementById('registerName').value;
+        const email = document.getElementById('registerEmail').value;
+        const password = document.getElementById('registerPassword').value;
+        const authCode = document.getElementById('authCode').value;
+        
+        console.log('Form values:', { name, email, password, authCode });
+        
+        if (!name || !email || !password || !authCode) {
+            alert('Please fill in all fields');
+            return;
+        }
+        
+        if (authCode !== "DISCORD2024") {
+            alert('Invalid authorization code. Use: DISCORD2024');
+            return;
+        }
+        
+        alert('✅ Form validation passed! Attempting Firebase registration...');
+        
+        // Try Firebase registration
+        if (typeof auth !== 'undefined') {
+            console.log('Attempting Firebase registration...');
+            // We'll add the actual Firebase code next
+        } else {
+            alert('Firebase auth not initialized');
+        }
+    });
+    
+    newLoginBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        console.log('🎯 LOGIN BUTTON CLICKED!');
+        alert('Login button clicked!');
+    });
+    
+    console.log('6. New event listeners attached');
+});
+
+// Check if our utility functions exist
+console.log('7. Utility functions check:');
+console.log('   - showLoading:', typeof showLoading);
+console.log('   - hideLoading:', typeof hideLoading);
+console.log('   - showError:', typeof showError);
 </script>
 </body>
 </html>
