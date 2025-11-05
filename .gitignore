@@ -1,0 +1,215 @@
+# ==================== FIREBASE & SECURITY ====================
+# Firebase configuration files
+config.js
+firebase-config.js
+firebase.json
+.firebase/
+.firebaserc
+
+# Environment variables
+.env
+.env.local
+.env.production
+.env.development
+.env.test
+
+# API keys and secrets
+secrets/
+keys/
+credentials/
+*.key
+*.pem
+*.crt
+
+# ==================== NODE.JS & DEPENDENCIES ====================
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# nyc test coverage
+.nyc_output
+
+# ==================== OPERATING SYSTEM FILES ====================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+
+# ==================== EDITOR & IDE FILES ====================
+# VS Code
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# JetBrains IDEs
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# ==================== BUILD & DEPLOYMENT ====================
+# Build outputs
+dist/
+build/
+out/
+.target/
+
+# Production files that should not be committed
+.cache/
+.parcel-cache/
+
+# Deployment
+.vercel/
+.netlify/
+
+# ==================== LOGS ====================
+# Log files
+*.log
+logs/
+
+# ==================== TEMPORARY FILES ====================
+# Temporary folders
+tmp/
+temp/
+*.tmp
+*.temp
+
+# ==================== FIREBASE SPECIFIC ====================
+# Firebase hosting and functions
+.firebase/hosting.*.cache
+functions/lib/
+functions/node_modules/
+
+# ==================== PROJECT SPECIFIC ====================
+# DisKenGrab specific
+# Database backups
+*.backup
+*.bak
+
+# Attack campaign data (if stored locally)
+campaigns/
+victims/
+exports/
+
+# User uploads (if any)
+uploads/
+assets/uploads/
+
+# Session data
+sessions/
+
+# ==================== SSL & CERTIFICATES ====================
+# SSL certificates
+*.csr
+*.cer
+*.der
+*.pfx
+*.p12
+
+# ==================== MISC ====================
+# Package lock files (choose one)
+# package-lock.json   # if using npm
+# yarn.lock           # if using yarn
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Microbundle cache
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# dotenv environment variables file
+.env
+
+# parcel-bundler cache (https://parceljs.org/)
+.cache
+.parcel-cache
+
+# next.js build output
+.next
+
+# nuxt.js build output
+.nuxt
+
+# vuepress build output
+.vuepress/dist
+
+# Serverless directories
+.serverless
+
+# FuseBox cache
+.fusebox/
+
+# DynamoDB Local files
+.dynamodb/
+
+# TernJS port file
+.tern-port
+
+# Stores VSCode versions used for testing VSCode extensions
+.vscode-test
+
+# ==================== GIT ====================
+# Git related
+*.orig
+*.rej
+
+# ==================== CUSTOM RULES ====================
+# Add any project-specific files or directories here
+# that should not be committed to version control
+
+# Local development overrides
+local.config.js
+override.config.js
+
+# Backup files from editors
+*~
+*.swp
+*.swo
+
+# Database files (if using local SQLite)
+*.db
+*.sqlite
+*.sqlite3
