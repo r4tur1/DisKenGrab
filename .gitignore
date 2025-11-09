@@ -212,3 +212,4 @@ override.config.js
 *.db
 *.sqlite
 *.sqlite3
+config.jsconfig.js
